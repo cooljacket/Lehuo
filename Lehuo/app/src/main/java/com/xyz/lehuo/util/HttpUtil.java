@@ -60,6 +60,7 @@ public class HttpUtil extends Thread {
 
     @Override
     public void run() {
+        Log.i(TAG, "Url============>" + url);
         httpClient = new DefaultHttpClient();
         HttpConnectionParams.setConnectionTimeout(httpClient.getParams(), timeout);
         try {
