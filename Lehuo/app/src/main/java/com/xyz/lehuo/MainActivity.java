@@ -3,6 +3,7 @@ package com.xyz.lehuo;
 import android.content.Intent;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -13,6 +14,8 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.facebook.drawee.backends.pipeline.Fresco;
+import com.facebook.drawee.view.SimpleDraweeView;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 import com.xyz.lehuo.First.FirstFragment;
 import com.xyz.lehuo.bean.User;
@@ -37,7 +40,7 @@ public class MainActivity extends BaseFragActivity {
     List<ImageView> ivIndicators = new ArrayList<ImageView>();
     List<TextView> tvIndicators = new ArrayList<TextView>();
 
-    ImageView mainUserLogol;
+    SimpleDraweeView mainUserLogol;
     ImageView scan;
     TextView titleText;
 
@@ -45,7 +48,7 @@ public class MainActivity extends BaseFragActivity {
     SlidingMenu.CanvasTransformer mTransformer;
     TextView username;
     RelativeLayout userLayout;
-    ImageView userLogol;
+    SimpleDraweeView userLogol;
     RelativeLayout colLayout;
     RelativeLayout focusLayout;
 
@@ -53,6 +56,7 @@ public class MainActivity extends BaseFragActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Fresco.initialize(this);
         setContentView(R.layout.activity_main);
         initSlidingMenu();
         initView();
@@ -60,7 +64,7 @@ public class MainActivity extends BaseFragActivity {
     }
 
     private void initView() {
-        mainUserLogol = (ImageView) findViewById(R.id.user_img);
+        mainUserLogol = (SimpleDraweeView) findViewById(R.id.user_img);
         scan = (ImageView) findViewById(R.id.scan);
         titleText = (TextView) findViewById(R.id.title_text);
         mainUserLogol.setOnClickListener(new View.OnClickListener() {
@@ -75,6 +79,9 @@ public class MainActivity extends BaseFragActivity {
                 Toast.makeText(MainActivity.this, "main", Toast.LENGTH_SHORT).show();
             }
         });
+        String url =  "http://img.my.csdn.net/uploads/201309/01/1378037235_3453.jpg";
+        Uri uri = Uri.parse(url);
+        mainUserLogol.setImageURI(uri);
 
         TextView tvFirst = (TextView) findViewById(R.id.first_tv);
         ImageView ivFirst = (ImageView) findViewById(R.id.first);
@@ -204,7 +211,7 @@ public class MainActivity extends BaseFragActivity {
         menu.setBehindCanvasTransformer(mTransformer);
         userLayout = (RelativeLayout) menu.findViewById(R.id.user_logol_layout);
         username = (TextView) menu.findViewById(R.id.user_name);
-        userLogol = (ImageView) menu.findViewById(R.id.user_logol);
+        userLogol = (SimpleDraweeView) menu.findViewById(R.id.user_logol);
         colLayout = (RelativeLayout) menu.findViewById(R.id.col_layout);
         focusLayout = (RelativeLayout) menu.findViewById(R.id.focus_layout);
         initUserData();
