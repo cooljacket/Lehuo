@@ -1,15 +1,19 @@
 package com.xyz.lehuo.bean;
 
+import android.content.Context;
+
+import com.xyz.lehuo.util.SPUtil;
+
 /**
  * Created by xyz on 15/12/18.
  */
 public class User {
 
     private String name;
-    private String pwd;
     private String major;
     private String grade;
     private String avatar;
+    private String sex;
 
     public User() {
 
@@ -55,11 +59,41 @@ public class User {
         this.name = name;
     }
 
-    public String getPwd() {
-        return pwd;
+    public String getSex() {
+        return sex;
     }
 
-    public void setPwd(String pwd) {
-        this.pwd = pwd;
+    public void setSex(String sex) {
+        this.sex = sex;
     }
+
+    public static void save(Context context, User user) {
+        SPUtil.put(context, "major", user.getMajor());
+        SPUtil.put(context, "name", user.getName());
+        SPUtil.put(context, "grade", user.getGrade());
+        SPUtil.put(context, "sex", user.getSex());
+        SPUtil.put(context, "avatar_url", user.getAvatar());
+    }
+
+    public static User load(Context context) {
+        User user = new User();
+        user.setName((String) SPUtil.get(context, "name", ""));
+        user.setMajor((String) SPUtil.get(context, "major", ""));
+        user.setGrade((String) SPUtil.get(context, "grade", ""));
+        user.setAvatar((String) SPUtil.get(context, "avatar", ""));
+        user.setSex((String) SPUtil.get(context, "sex", ""));
+        return user;
+    }
+
+    public static void clear(Context context) {
+        SPUtil.remove(context, "name");
+        SPUtil.remove(context, "major");
+        SPUtil.remove(context, "grade");
+        SPUtil.remove(context, "sex");
+        SPUtil.remove(context, "name");
+        SPUtil.remove(context, "name");
+
+
+    }
+
 }

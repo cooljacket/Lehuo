@@ -11,9 +11,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.xyz.lehuo.R;
+import com.xyz.lehuo.bean.User;
 import com.xyz.lehuo.global.BaseActivity;
+import com.xyz.lehuo.global.Conf;
 import com.xyz.lehuo.global.Constant;
+import com.xyz.lehuo.global.MyApplication;
 import com.xyz.lehuo.util.HttpUtil;
+import com.xyz.lehuo.util.SPUtil;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
@@ -27,6 +31,8 @@ import java.util.List;
  * Created by xyz on 15/12/24.
  */
 public class LoginActivity extends BaseActivity {
+
+    public static final int LOGIN_SUCCESS = 2;
 
     ImageView back;
     TextView register;
@@ -85,7 +91,7 @@ public class LoginActivity extends BaseActivity {
 
                     @Override
                     public void onError() {
-                        Toast.makeText(LoginActivity.this, "网络异常", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(LoginActivity.this, "网络出错", Toast.LENGTH_SHORT).show();
                     }
 
                     @Override
@@ -93,9 +99,23 @@ public class LoginActivity extends BaseActivity {
                         try {
                             JSONObject jsonObject = new JSONObject(result);
                             if (jsonObject.getInt("code") == 1) {
-
+                                Toast.makeText(LoginActivity.this, "登录成功", Toast.LENGTH_SHORT).show();
+                                Conf.isLogin = true;
+                                JSONObject object = jsonObject.getJSONObject("data");
+                                User user = new User();
+                                user.setName(object.getString("name"));
+                                user.setMajor(object.getString("major"));
+                                user.setGrade(object.getString("grade"));
+                                user.setSex(object.getString("sex"));
+                                user.setPwd(object.getString("pwd"));
+                                user.setAvatar(object.getString(""));
+                                User.save(LoginActivity.this, user);
+                                ((MyApplication)getApplication()).setUser(user);
+                                SPUtil.put(LoginActivity.this, "isLogin", Conf.isLogin);
+                                setResult(LOGIN_SUCCESS);
+                                LoginActivity.this.finish();
                             } else {
-
+                                Toast.makeText(LoginActivity.this, "网络出错", Toast.LENGTH_SHORT).show();
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();

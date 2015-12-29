@@ -25,12 +25,15 @@ import com.xyz.lehuo.global.Conf;
 import com.xyz.lehuo.global.MyApplication;
 import com.xyz.lehuo.society.SocietyFragment;
 import com.xyz.lehuo.user.LoginActivity;
+import com.xyz.lehuo.user.UserInfoActivity;
 
 import java.util.ArrayList;
 import java.util.List;
 
 
 public class MainActivity extends BaseFragActivity {
+
+    public static final int LOGIN = 1;
 
     List<Fragment> fragments = new ArrayList<Fragment>();
     FirstFragment firstFragment;
@@ -131,8 +134,8 @@ public class MainActivity extends BaseFragActivity {
             societyFragment = new SocietyFragment();
         }
         fragments.add(firstFragment);
-        fragments.add(discoverFragment);
         fragments.add(societyFragment);
+        fragments.add(discoverFragment);
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         for (int i = 0; i < fragments.size(); i++) {
             if (!fragments.get(i).isAdded()) {
@@ -215,36 +218,69 @@ public class MainActivity extends BaseFragActivity {
         colLayout = (RelativeLayout) menu.findViewById(R.id.col_layout);
         focusLayout = (RelativeLayout) menu.findViewById(R.id.focus_layout);
         initUserData();
+        initSlidingMenuListener();
     }
 
     private void initUserData() {
         if (Conf.isLogin == true) {
             User user = ((MyApplication)getApplication()).getUser();
             username.setText(user.getName());
-
+            if (user.getAvatar().equals("")) {
+                userLogol.setImageResource(R.mipmap.mine);
+            } else {
+                Uri uri = Uri.parse(user.getAvatar());
+                userLogol.setImageURI(uri);
+            }
         } else {
             userLogol.setImageResource(R.mipmap.mine);
             username.setText("未登录");
-            userLayout.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    startActivity(new Intent(MainActivity.this, LoginActivity.class));
-                }
-            });
-            colLayout.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Toast.makeText(MainActivity.this, "请先登录", Toast.LENGTH_SHORT).show();
-                }
-            });
-            focusLayout.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Toast.makeText(MainActivity.this, "请先登录", Toast.LENGTH_SHORT).show();
-                }
-            });
         }
     }
 
+    private void initSlidingMenuListener() {
+        userLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (Conf.isLogin == false) {
+                    startActivityForResult(new Intent(MainActivity.this, LoginActivity.class), LOGIN);
+                } else {
+                    startActivity(new Intent(MainActivity.this, UserInfoActivity.class));
+                }
+            }
+        });
+        colLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (Conf.isLogin == false) {
+                    Toast.makeText(MainActivity.this, "请先登录", Toast.LENGTH_SHORT).show();
+                } else {
 
+                }
+            }
+        });
+        focusLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (Conf.isLogin == false) {
+                    Toast.makeText(MainActivity.this, "请先登录", Toast.LENGTH_SHORT).show();
+                } else {
+
+                }
+            }
+        });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == LOGIN && resultCode == LoginActivity.LOGIN_SUCCESS) {
+            User user = ((MyApplication)getApplication()).getUser();
+            username.setText(user.getName());
+            if (user.getAvatar().equals("")) {
+                userLogol.setImageResource(R.mipmap.mine);
+            } else {
+                Uri uri = Uri.parse(user.getAvatar());
+                userLogol.setImageURI(uri);
+            }
+        }
+    }
 }

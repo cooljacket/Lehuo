@@ -1,17 +1,21 @@
 package com.xyz.lehuo.First;
 
+import android.content.Context;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.PagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewParent;
 import android.widget.ListView;
-import android.widget.Toast;
 
+import com.facebook.drawee.view.SimpleDraweeView;
 import com.xyz.lehuo.R;
-import com.xyz.lehuo.view.MySwipeRefreshLayout;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,10 +25,14 @@ import java.util.List;
  */
 public class FirstFragment extends Fragment {
 
-    private MySwipeRefreshLayout refreshLayout;
+    private SwipeRefreshLayout refreshLayout;
     private ListView listView;
     private List<com.xyz.lehuo.bean.Activity> activities = new ArrayList<com.xyz.lehuo.bean.Activity>();
     private FirstAdapter adapter;
+    private ViewPager vp;
+    private View headView;
+    private BannerAdapter bannerAdapter;
+    private List<String> bannerUrls = new ArrayList<String>();
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -42,9 +50,11 @@ public class FirstFragment extends Fragment {
     }
 
     private void initView(View v) {
-        refreshLayout = (MySwipeRefreshLayout) v.findViewById(R.id.refresh_layout);
+        headView = LayoutInflater.from(getActivity()).inflate(R.layout.banner_headview, null);
+        vp = (ViewPager) headView.findViewById(R.id.vp);
+        refreshLayout = (SwipeRefreshLayout) v.findViewById(R.id.refresh_layout);
         listView = (ListView) v.findViewById(R.id.list);
-        refreshLayout.setListView(listView);
+        listView.addHeaderView(headView);
         adapter = new FirstAdapter(activities, getActivity());
         listView.setAdapter(adapter);
     }
@@ -59,7 +69,10 @@ public class FirstFragment extends Fragment {
             activity.setOrganizer("中山大学东校区数据学院发展中心");
             activity.setImgUrl("http://img.my.csdn.net/uploads/201309/01/1378037235_3453.jpg");
             activities.add(activity);
+            bannerUrls.add("http://img.my.csdn.net/uploads/201309/01/1378037235_3453.jpg");
         }
+        bannerAdapter = new BannerAdapter(getActivity(), bannerUrls);
+        vp.setAdapter(bannerAdapter);
         adapter.setData(activities);
     }
 
@@ -94,28 +107,6 @@ public class FirstFragment extends Fragment {
             }
         });
 
-        refreshLayout.setOnLoadListener(new MySwipeRefreshLayout.OnLoadListener() {
-            @Override
-            public void onLoad() {
-                refreshLayout.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (activities.size() > 10) {
-                            Toast.makeText(getActivity(), "no more data", Toast.LENGTH_SHORT).show();
-                            refreshLayout.setLoading(false);
-                            return;
-                        }
-                        addData();
-                        refreshLayout.setLoading(false);
-                    }
-                }, 3000);
-            }
-        });
-    }
-
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
     }
 
     @Override
@@ -134,11 +125,6 @@ public class FirstFragment extends Fragment {
     }
 
     @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-    }
-
-    @Override
     public void onStop() {
         super.onStop();
     }
@@ -153,8 +139,63 @@ public class FirstFragment extends Fragment {
         super.onDestroy();
     }
 
-    @Override
-    public void onDetach() {
-        super.onDetach();
+
+    class BannerAdapter extends PagerAdapter {
+
+        private Context context;
+        private List<String> urls;
+        private List<SimpleDraweeView> imageViews;
+        //private int imageWidth;
+        //private int imageHeight;
+
+        public BannerAdapter(Context context, List<String> urls) {
+            this.context = context;
+            //this.urls = urls;
+            initUrls(urls);
+        }
+
+        void initUrls(List<String> urls) {
+            this.urls = urls;
+            imageViews = new ArrayList<SimpleDraweeView>();
+            for (int i = 0; i < urls.size(); i++) {
+                Uri uri = Uri.parse(urls.get(i));
+                //ViewGroup.LayoutParams params = new ViewGroup.LayoutParams(300, 300);
+                SimpleDraweeView view = new SimpleDraweeView(context, null, R.style.banner_image);
+                //åview.setLayoutParams(params);
+                view.setImageURI(uri);
+                imageViews.add(view);
+            }
+        }
+
+        @Override
+        public int getCount() {
+            return urls.size();
+        }
+
+        @Override
+        public boolean isViewFromObject(View view, Object object) {
+            return view == object;
+        }
+
+        @Override
+        public Object instantiateItem(ViewGroup container, int position) {
+            SimpleDraweeView image = imageViews.get(position);
+            ViewParent vp = image.getParent();
+            if (vp != null) {
+                ((ViewGroup)vp).removeView(image);
+            }
+            container.addView(image);
+            return image;
+        }
+
+        @Override
+        public void destroyItem(ViewGroup container, int position, Object object) {
+
+        }
+
+        public void setData(List<String> urls) {
+            this.urls = urls;
+            notifyDataSetChanged();
+        }
     }
 }

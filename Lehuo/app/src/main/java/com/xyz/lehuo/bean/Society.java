@@ -1,0 +1,65 @@
+package com.xyz.lehuo.bean;
+
+import java.util.ArrayList;
+
+/**
+ * Created by xyz on 15/12/29.
+ */
+public class Society {
+
+    private String imgUrl;
+    private String name;
+    private String slogan;
+    private String intro;
+    private ArrayList<Activity> activities;
+    private ArrayList<Activity> recentActivities;
+
+
+    public ArrayList<Activity> getActivities() {
+        return activities;
+    }
+
+    public void setActivities(ArrayList<Activity> activities) {
+        this.activities = activities;
+    }
+
+    public String getImgUrl() {
+        return imgUrl;
+    }
+
+    public void setImgUrl(String imgUrl) {
+        this.imgUrl = imgUrl;
+    }
+
+    public String getIntro() {
+        return intro;
+    }
+
+    public void setIntro(String intro) {
+        this.intro = intro;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public ArrayList<Activity> getRecentActivities() {
+        return recentActivities;
+    }
+
+    public void setRecentActivities(ArrayList<Activity> recentActivities) {
+        this.recentActivities = recentActivities;
+    }
+
+    public String getSlogan() {
+        return slogan;
+    }
+
+    public void setSlogan(String slogan) {
+        this.slogan = slogan;
+    }
+}

@@ -158,9 +158,10 @@ public class RegisterActivity extends BaseActivity {
                         try {
                             JSONObject jsonObject = new JSONObject(result);
                             if (jsonObject.getInt("code") == 1) {
-
+                                Toast.makeText(RegisterActivity.this, "注册成功", Toast.LENGTH_SHORT).show();
+                                RegisterActivity.this.finish();
                             } else {
-
+                                Toast.makeText(RegisterActivity.this, "网络出错", Toast.LENGTH_SHORT).show();
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
