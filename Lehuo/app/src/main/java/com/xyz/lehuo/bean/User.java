@@ -9,7 +9,9 @@ import com.xyz.lehuo.util.SPUtil;
  */
 public class User {
 
+    private String id;
     private String name;
+    private String pwd;
     private String major;
     private String grade;
     private String avatar;
@@ -67,12 +69,29 @@ public class User {
         this.sex = sex;
     }
 
+    public String getPwd() {
+        return pwd;
+    }
+
+    public void setPwd(String pwd) {
+        this.pwd = pwd;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
     public static void save(Context context, User user) {
         SPUtil.put(context, "major", user.getMajor());
         SPUtil.put(context, "name", user.getName());
         SPUtil.put(context, "grade", user.getGrade());
         SPUtil.put(context, "sex", user.getSex());
         SPUtil.put(context, "avatar_url", user.getAvatar());
+        SPUtil.put(context, "pwd", user.getPwd());
     }
 
     public static User load(Context context) {
@@ -82,6 +101,7 @@ public class User {
         user.setGrade((String) SPUtil.get(context, "grade", ""));
         user.setAvatar((String) SPUtil.get(context, "avatar", ""));
         user.setSex((String) SPUtil.get(context, "sex", ""));
+        user.setPwd((String) SPUtil.get(context, "pwd", ""));
         return user;
     }
 
@@ -90,10 +110,8 @@ public class User {
         SPUtil.remove(context, "major");
         SPUtil.remove(context, "grade");
         SPUtil.remove(context, "sex");
-        SPUtil.remove(context, "name");
-        SPUtil.remove(context, "name");
-
-
+        SPUtil.remove(context, "avatar");
+        SPUtil.remove(context, "pwd");
     }
 
 }

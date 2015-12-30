@@ -5,6 +5,7 @@ package com.xyz.lehuo.bean;
  */
 public class Activity {
 
+    private String id;
     private String title;
     private int readNum;
     private String startDate;
@@ -121,5 +122,13 @@ public class Activity {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 }

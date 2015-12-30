@@ -7,6 +7,7 @@ import java.util.ArrayList;
  */
 public class Society {
 
+    private String id;
     private String imgUrl;
     private String name;
     private String slogan;
@@ -61,5 +62,13 @@ public class Society {
 
     public void setSlogan(String slogan) {
         this.slogan = slogan;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 }

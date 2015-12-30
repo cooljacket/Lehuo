@@ -134,10 +134,10 @@ public class RegisterActivity extends BaseActivity {
                 List<NameValuePair> params = new ArrayList<NameValuePair>();
                 params.add(new BasicNameValuePair("name", name));
                 params.add(new BasicNameValuePair("pwd", password));
-                params.add(new BasicNameValuePair("sex", sex));
-                params.add(new BasicNameValuePair("major", majorString));
-                params.add(new BasicNameValuePair("grade", gradeString));
-                new HttpUtil().create(HttpUtil.POST, Constant.SERVER_ADDRESS + Constant.REGISTER_API, params, new HttpUtil.HttpCallBallListener() {
+                params.add(new BasicNameValuePair("sex", sex.equals("女")?"0":"1"));
+                params.add(new BasicNameValuePair("major", Constant.majorNum(majorString)));
+                params.add(new BasicNameValuePair("grade", Constant.gradeNum(gradeString)));
+                new HttpUtil().create(HttpUtil.POST, Constant.REGISTER_API, params, new HttpUtil.HttpCallBallListener() {
                     @Override
                     public void onStart() {
                         pd = ProgressDialog.show(RegisterActivity.this, "提示", "注册中，请稍等");
@@ -161,7 +161,7 @@ public class RegisterActivity extends BaseActivity {
                                 Toast.makeText(RegisterActivity.this, "注册成功", Toast.LENGTH_SHORT).show();
                                 RegisterActivity.this.finish();
                             } else {
-                                Toast.makeText(RegisterActivity.this, "网络出错", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(RegisterActivity.this, "服务器出错", Toast.LENGTH_SHORT).show();
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();

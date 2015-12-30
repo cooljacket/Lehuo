@@ -1,12 +1,16 @@
 package com.xyz.lehuo;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -17,15 +21,19 @@ import android.widget.Toast;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
-import com.xyz.lehuo.First.FirstFragment;
 import com.xyz.lehuo.bean.User;
 import com.xyz.lehuo.discover.DiscoverFragment;
+import com.xyz.lehuo.first.FirstFragment;
 import com.xyz.lehuo.global.BaseFragActivity;
 import com.xyz.lehuo.global.Conf;
 import com.xyz.lehuo.global.MyApplication;
 import com.xyz.lehuo.society.SocietyFragment;
+import com.xyz.lehuo.user.CollectionActivity;
 import com.xyz.lehuo.user.LoginActivity;
+import com.xyz.lehuo.user.ModifyUserInfoActivity;
 import com.xyz.lehuo.user.UserInfoActivity;
+import com.xyz.lehuo.util.SPUtil;
+import com.zbar.lib.CaptureActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,7 +41,11 @@ import java.util.List;
 
 public class MainActivity extends BaseFragActivity {
 
+    public static final String TAG = "MainActivity";
+
     public static final int LOGIN = 1;
+    public static final int USER_INFO = 2;
+    public static final int SCAN_QR_CODE = 3;
 
     List<Fragment> fragments = new ArrayList<Fragment>();
     FirstFragment firstFragment;
@@ -64,6 +76,7 @@ public class MainActivity extends BaseFragActivity {
         initSlidingMenu();
         initView();
         initFragment();
+        initBroadcastReceiver();
     }
 
     private void initView() {
@@ -79,12 +92,11 @@ public class MainActivity extends BaseFragActivity {
         scan.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(MainActivity.this, "main", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(MainActivity.this, "main", Toast.LENGTH_SHORT).show();
+                startActivityForResult(new Intent(MainActivity.this, CaptureActivity.class), SCAN_QR_CODE);
             }
         });
-        String url =  "http://img.my.csdn.net/uploads/201309/01/1378037235_3453.jpg";
-        Uri uri = Uri.parse(url);
-        mainUserLogol.setImageURI(uri);
+        mainUserLogol.setImageResource(R.mipmap.mine);
 
         TextView tvFirst = (TextView) findViewById(R.id.first_tv);
         ImageView ivFirst = (ImageView) findViewById(R.id.first);
@@ -120,6 +132,12 @@ public class MainActivity extends BaseFragActivity {
                 showTab(2);
             }
         });
+    }
+
+    private void initBroadcastReceiver() {
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(ModifyUserInfoActivity.MODIFY_SUCCESS);
+        registerReceiver(mReceiver, filter);
     }
 
     private void initFragment() {
@@ -217,13 +235,15 @@ public class MainActivity extends BaseFragActivity {
         userLogol = (SimpleDraweeView) menu.findViewById(R.id.user_logol);
         colLayout = (RelativeLayout) menu.findViewById(R.id.col_layout);
         focusLayout = (RelativeLayout) menu.findViewById(R.id.focus_layout);
+        Conf.isLogin = (boolean) SPUtil.get(this, "isLogin", false);
         initUserData();
         initSlidingMenuListener();
     }
 
     private void initUserData() {
         if (Conf.isLogin == true) {
-            User user = ((MyApplication)getApplication()).getUser();
+            User user = User.load(this);
+            ((MyApplication)getApplication()).setUser(user);
             username.setText(user.getName());
             if (user.getAvatar().equals("")) {
                 userLogol.setImageResource(R.mipmap.mine);
@@ -244,7 +264,7 @@ public class MainActivity extends BaseFragActivity {
                 if (Conf.isLogin == false) {
                     startActivityForResult(new Intent(MainActivity.this, LoginActivity.class), LOGIN);
                 } else {
-                    startActivity(new Intent(MainActivity.this, UserInfoActivity.class));
+                    startActivityForResult(new Intent(MainActivity.this, UserInfoActivity.class), USER_INFO);
                 }
             }
         });
@@ -254,7 +274,7 @@ public class MainActivity extends BaseFragActivity {
                 if (Conf.isLogin == false) {
                     Toast.makeText(MainActivity.this, "请先登录", Toast.LENGTH_SHORT).show();
                 } else {
-
+                    startActivity(new Intent(MainActivity.this, CollectionActivity.class));
                 }
             }
         });
@@ -277,10 +297,44 @@ public class MainActivity extends BaseFragActivity {
             username.setText(user.getName());
             if (user.getAvatar().equals("")) {
                 userLogol.setImageResource(R.mipmap.mine);
+                mainUserLogol.setImageResource(R.mipmap.mine);
             } else {
                 Uri uri = Uri.parse(user.getAvatar());
                 userLogol.setImageURI(uri);
+                mainUserLogol.setImageURI(uri);
             }
+        } else if (requestCode == USER_INFO && resultCode == UserInfoActivity.LOGOUT) {
+            username.setText("未登录");
+            userLogol.setImageResource(R.mipmap.mine);
+            mainUserLogol.setImageResource(R.mipmap.mine);
+        } else if (requestCode == SCAN_QR_CODE && resultCode == CaptureActivity.SCAN_SUCCESS) {
+            Log.i(TAG, data.getStringExtra("result"));
+
         }
     }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(mReceiver);
+    }
+
+    BroadcastReceiver mReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent.getAction().equals(ModifyUserInfoActivity.MODIFY_SUCCESS)) {
+                User user = ((MyApplication)getApplication()).getUser();
+                if (user.getAvatar().equals("")) {
+                    userLogol.setImageResource(R.mipmap.mine);
+                    mainUserLogol.setImageResource(R.mipmap.mine);
+                } else {
+                    Uri uri = Uri.parse(user.getAvatar());
+                    userLogol.setImageURI(uri);
+                    mainUserLogol.setImageURI(uri);
+                }
+            }
+        }
+    };
+
+
 }

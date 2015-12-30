@@ -78,7 +78,7 @@ public class LoginActivity extends BaseActivity {
                 List<NameValuePair> params = new ArrayList<NameValuePair>();
                 params.add(new BasicNameValuePair("name", name));
                 params.add(new BasicNameValuePair("pwd", pwd));
-                new HttpUtil().create(HttpUtil.POST, Constant.SERVER_ADDRESS+Constant.LOGIN_API, params, new HttpUtil.HttpCallBallListener() {
+                new HttpUtil().create(HttpUtil.POST, Constant.LOGIN_API, params, new HttpUtil.HttpCallBallListener() {
                     @Override
                     public void onStart() {
                         progressDialog = ProgressDialog.show(LoginActivity.this, "提示", "登录中，请稍等");
@@ -104,18 +104,18 @@ public class LoginActivity extends BaseActivity {
                                 JSONObject object = jsonObject.getJSONObject("data");
                                 User user = new User();
                                 user.setName(object.getString("name"));
-                                user.setMajor(object.getString("major"));
-                                user.setGrade(object.getString("grade"));
-                                user.setSex(object.getString("sex"));
+                                user.setMajor(Constant.majors[Integer.parseInt(object.getString("major"))]);
+                                user.setGrade(Constant.grades[Integer.parseInt(object.getString("grade"))]);
+                                user.setSex(object.getString("sex").equals("1")?"男":"女");
                                 user.setPwd(object.getString("pwd"));
-                                user.setAvatar(object.getString(""));
+                                user.setAvatar(object.getString("avatar_url"));
                                 User.save(LoginActivity.this, user);
                                 ((MyApplication)getApplication()).setUser(user);
                                 SPUtil.put(LoginActivity.this, "isLogin", Conf.isLogin);
                                 setResult(LOGIN_SUCCESS);
                                 LoginActivity.this.finish();
                             } else {
-                                Toast.makeText(LoginActivity.this, "网络出错", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(LoginActivity.this, "用户名或密码出错", Toast.LENGTH_SHORT).show();
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
