@@ -1,7 +1,8 @@
-package com.xyz.lehuo.society;
+package com.xyz.lehuo.club;
 
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -10,23 +11,24 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.xyz.lehuo.R;
-import com.xyz.lehuo.bean.Society;
+import com.xyz.lehuo.bean.Club;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class SocietyFragment extends Fragment {
+public class ClubFragment extends Fragment {
 
     SwipeRefreshLayout refreshLayout;
     ListView list;
     MyAdapter adapter;
-    List<Society> societies;
+    List<Club> clubs;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -36,7 +38,7 @@ public class SocietyFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_society, container, false);
+        View view = inflater.inflate(R.layout.fragment_club, container, false);
         initView(view);
         return view;
     }
@@ -49,14 +51,14 @@ public class SocietyFragment extends Fragment {
     }
 
     private void initData() {
-        societies = new ArrayList<Society>();
+        clubs = new ArrayList<Club>();
         for (int i = 0; i < 2; i++) {
-            Society society = new Society();
-            society.setImgUrl("http://img.my.csdn.net/uploads/201309/01/1378037235_3453.jpg");
-            society.setName("社团");
-            societies.add(society);
+            Club club = new Club();
+            club.setImgUrl("http://img.my.csdn.net/uploads/201309/01/1378037235_3453.jpg");
+            club.setName("社团");
+            clubs.add(club);
         }
-        adapter = new MyAdapter(getActivity(), societies);
+        adapter = new MyAdapter(getActivity(), clubs);
         list.setAdapter(adapter);
     }
 
@@ -74,6 +76,14 @@ public class SocietyFragment extends Fragment {
                         initData();
                     }
                 }, 1000);
+            }
+        });
+        list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Intent intent = new Intent(getActivity(), ClubDetailActivity.class);
+                intent.putExtra("club", clubs.get(position));
+                startActivity(intent);
             }
         });
     }
@@ -111,9 +121,9 @@ public class SocietyFragment extends Fragment {
     class MyAdapter extends BaseAdapter {
 
         Context context;
-        List<Society> societies;
+        List<Club> societies;
 
-        MyAdapter(Context context, List<Society> societies) {
+        MyAdapter(Context context, List<Club> societies) {
             this.context = context;
             this.societies = societies;
         }
@@ -137,7 +147,7 @@ public class SocietyFragment extends Fragment {
         public View getView(int position, View convertView, ViewGroup parent) {
             ViewHolder viewHolder;
             if (convertView == null) {
-                convertView = LayoutInflater.from(context).inflate(R.layout.item_listview_society, null);
+                convertView = LayoutInflater.from(context).inflate(R.layout.item_listview_club, null);
                 viewHolder = new ViewHolder();
                 viewHolder.img = (SimpleDraweeView) convertView.findViewById(R.id.img);
                 viewHolder.name = (TextView) convertView.findViewById(R.id.name);

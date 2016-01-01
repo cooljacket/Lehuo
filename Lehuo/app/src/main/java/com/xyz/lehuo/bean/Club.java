@@ -1,16 +1,16 @@
 package com.xyz.lehuo.bean;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 /**
  * Created by xyz on 15/12/29.
  */
-public class Society {
+public class Club implements Serializable {
 
     private String id;
     private String imgUrl;
     private String name;
-    private String slogan;
     private String intro;
     private ArrayList<Activity> activities;
     private ArrayList<Activity> recentActivities;
@@ -54,14 +54,6 @@ public class Society {
 
     public void setRecentActivities(ArrayList<Activity> recentActivities) {
         this.recentActivities = recentActivities;
-    }
-
-    public String getSlogan() {
-        return slogan;
-    }
-
-    public void setSlogan(String slogan) {
-        this.slogan = slogan;
     }
 
     public String getId() {

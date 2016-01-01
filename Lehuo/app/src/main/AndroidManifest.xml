@@ -19,7 +19,6 @@
         android:theme="@style/AppTheme" >
         <activity
             android:name=".MainActivity"
-            android:launchMode="singleInstance"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -33,9 +32,9 @@
         <activity android:name=".user.UserInfoActivity"></activity>
         <activity android:name=".user.CollectionActivity"></activity>
         <activity android:name=".user.ClipUserLogolActivity"></activity>
-        <activity android:name=".society.SocietyDetailActivity"></activity>
-        <activity android:name=".first.WebActivity"></activity>
+        <activity android:name=".club.ClubDetailActivity"></activity>
         <activity android:name="com.zbar.lib.CaptureActivity"></activity>
+        <activity android:name=".WebActivity"></activity>
     </application>
 
 </manifest>

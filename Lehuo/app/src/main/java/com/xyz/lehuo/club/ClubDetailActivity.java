@@ -1,18 +1,21 @@
-package com.xyz.lehuo.society;
+package com.xyz.lehuo.club;
 
 import android.app.ProgressDialog;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.xyz.lehuo.R;
 import com.xyz.lehuo.bean.Activity;
+import com.xyz.lehuo.bean.Club;
 import com.xyz.lehuo.global.BaseFragActivity;
 
 import java.util.ArrayList;
@@ -21,18 +24,20 @@ import java.util.List;
 /**
  * Created by xyz on 15/12/30.
  */
-public class SocietyDetailActivity extends BaseFragActivity implements View.OnClickListener {
+public class ClubDetailActivity extends BaseFragActivity implements View.OnClickListener {
 
     private ViewPager vp;
-    private SimpleDraweeView societyLogol;
+    private ImageView back;
+    private SimpleDraweeView societyLogo;
     private TextView name;
     private List<Fragment> fragments = new ArrayList<Fragment>();
-    private SocietyIntroFragment introFragment;
-    private SocietyAllFragment allActivityFragment;
-    private SocietyAllFragment recentActivityFragment;
+    private ClubIntroFragment introFragment;
+    private ClubAllFragment allActivityFragment;
+    private ClubAllFragment recentActivityFragment;
     private FragmentPagerAdapter adapter;
     private List<TextView> tvIndicators = new ArrayList<TextView>();
     private List<View> vIndicators = new ArrayList<View>();
+    private Club club;
 
     private ProgressDialog pd;
 
@@ -44,15 +49,15 @@ public class SocietyDetailActivity extends BaseFragActivity implements View.OnCl
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_society_detail);
+        setContentView(R.layout.activity_club_detail);
         initData();
         initView();
     }
 
     private void initData() {
-        introFragment = new SocietyIntroFragment();
-        allActivityFragment = new SocietyAllFragment();
-        recentActivityFragment = new SocietyAllFragment();
+        introFragment = new ClubIntroFragment();
+        allActivityFragment = new ClubAllFragment();
+        recentActivityFragment = new ClubAllFragment();
         fragments.add(introFragment);
         fragments.add(allActivityFragment);
         fragments.add(recentActivityFragment);
@@ -67,12 +72,17 @@ public class SocietyDetailActivity extends BaseFragActivity implements View.OnCl
                 return fragments.size();
             }
         };
+        club = (Club) getIntent().getSerializableExtra("club");
 
     }
 
     private void initView() {
-        societyLogol = (SimpleDraweeView) findViewById(R.id.society_img);
-        name = (TextView) findViewById(R.id.society_name);
+        societyLogo = (SimpleDraweeView) findViewById(R.id.club_img);
+        societyLogo.setImageURI(Uri.parse(club.getImgUrl()));
+        name = (TextView) findViewById(R.id.club_name);
+        name.setText(club.getName());
+        back = (ImageView) findViewById(R.id.back);
+        back.setOnClickListener(this);
         vp = (ViewPager) findViewById(R.id.vp);
         vp.setOffscreenPageLimit(3);
         LinearLayout llOne = (LinearLayout) findViewById(R.id.intro_ll);
@@ -144,6 +154,9 @@ public class SocietyDetailActivity extends BaseFragActivity implements View.OnCl
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
+            case R.id.back:
+                finish();
+                break;
             case R.id.intro_ll:
                 vp.setCurrentItem(0, false);
                 setIndicators(0);

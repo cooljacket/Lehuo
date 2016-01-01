@@ -27,7 +27,7 @@ import com.xyz.lehuo.first.FirstFragment;
 import com.xyz.lehuo.global.BaseFragActivity;
 import com.xyz.lehuo.global.Conf;
 import com.xyz.lehuo.global.MyApplication;
-import com.xyz.lehuo.society.SocietyFragment;
+import com.xyz.lehuo.club.ClubFragment;
 import com.xyz.lehuo.user.CollectionActivity;
 import com.xyz.lehuo.user.LoginActivity;
 import com.xyz.lehuo.user.ModifyUserInfoActivity;
@@ -50,12 +50,12 @@ public class MainActivity extends BaseFragActivity {
     List<Fragment> fragments = new ArrayList<Fragment>();
     FirstFragment firstFragment;
     DiscoverFragment discoverFragment;
-    SocietyFragment societyFragment;
+    ClubFragment clubFragment;
 
     List<ImageView> ivIndicators = new ArrayList<ImageView>();
     List<TextView> tvIndicators = new ArrayList<TextView>();
 
-    SimpleDraweeView mainUserLogol;
+    SimpleDraweeView mainUserLogo;
     ImageView scan;
     TextView titleText;
 
@@ -63,7 +63,7 @@ public class MainActivity extends BaseFragActivity {
     SlidingMenu.CanvasTransformer mTransformer;
     TextView username;
     RelativeLayout userLayout;
-    SimpleDraweeView userLogol;
+    SimpleDraweeView userLogo;
     RelativeLayout colLayout;
     RelativeLayout focusLayout;
 
@@ -73,17 +73,17 @@ public class MainActivity extends BaseFragActivity {
         super.onCreate(savedInstanceState);
         Fresco.initialize(this);
         setContentView(R.layout.activity_main);
-        initSlidingMenu();
         initView();
         initFragment();
+        initSlidingMenu();
         initBroadcastReceiver();
     }
 
     private void initView() {
-        mainUserLogol = (SimpleDraweeView) findViewById(R.id.user_img);
+        mainUserLogo = (SimpleDraweeView) findViewById(R.id.user_img);
         scan = (ImageView) findViewById(R.id.scan);
         titleText = (TextView) findViewById(R.id.title_text);
-        mainUserLogol.setOnClickListener(new View.OnClickListener() {
+        mainUserLogo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 menu.toggle();
@@ -92,23 +92,21 @@ public class MainActivity extends BaseFragActivity {
         scan.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //Toast.makeText(MainActivity.this, "main", Toast.LENGTH_SHORT).show();
                 startActivityForResult(new Intent(MainActivity.this, CaptureActivity.class), SCAN_QR_CODE);
             }
         });
-        mainUserLogol.setImageResource(R.mipmap.mine);
 
         TextView tvFirst = (TextView) findViewById(R.id.first_tv);
         ImageView ivFirst = (ImageView) findViewById(R.id.first);
-        TextView tvSociety = (TextView) findViewById(R.id.society_tv);
-        ImageView ivSociety = (ImageView) findViewById(R.id.society);
+        TextView tvClub = (TextView) findViewById(R.id.club_tv);
+        ImageView ivClub = (ImageView) findViewById(R.id.club);
         TextView tvDiscover = (TextView) findViewById(R.id.discover_tv);
         ImageView ivDiscover = (ImageView) findViewById(R.id.discover);
         ivIndicators.add(ivFirst);
-        ivIndicators.add(ivSociety);
+        ivIndicators.add(ivClub);
         ivIndicators.add(ivDiscover);
         tvIndicators.add(tvFirst);
-        tvIndicators.add(tvSociety);
+        tvIndicators.add(tvClub);
         tvIndicators.add(tvDiscover);
 
         LinearLayout firstLayout = (LinearLayout) findViewById(R.id.first_layout);
@@ -148,11 +146,11 @@ public class MainActivity extends BaseFragActivity {
         if (discoverFragment == null) {
             discoverFragment = new DiscoverFragment();
         }
-        if (societyFragment == null) {
-            societyFragment = new SocietyFragment();
+        if (clubFragment == null) {
+            clubFragment = new ClubFragment();
         }
         fragments.add(firstFragment);
-        fragments.add(societyFragment);
+        fragments.add(clubFragment);
         fragments.add(discoverFragment);
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         for (int i = 0; i < fragments.size(); i++) {
@@ -184,7 +182,7 @@ public class MainActivity extends BaseFragActivity {
             case 0:
                 ivIndicators.get(0).setImageResource(R.mipmap.first_press);
                 tvIndicators.get(0).setTextColor(Color.parseColor("#5479b8"));
-                ivIndicators.get(1).setImageResource(R.mipmap.society);
+                ivIndicators.get(1).setImageResource(R.mipmap.club);
                 tvIndicators.get(1).setTextColor(Color.parseColor("#a2a3a3"));
                 ivIndicators.get(2).setImageResource(R.mipmap.discover);
                 tvIndicators.get(2).setTextColor(Color.parseColor("#a2a3a3"));
@@ -193,7 +191,7 @@ public class MainActivity extends BaseFragActivity {
             case 1:
                 ivIndicators.get(0).setImageResource(R.mipmap.first);
                 tvIndicators.get(0).setTextColor(Color.parseColor("#a2a3a3"));
-                ivIndicators.get(1).setImageResource(R.mipmap.society_press);
+                ivIndicators.get(1).setImageResource(R.mipmap.club_press);
                 tvIndicators.get(1).setTextColor(Color.parseColor("#5479b8"));
                 ivIndicators.get(2).setImageResource(R.mipmap.discover);
                 tvIndicators.get(2).setTextColor(Color.parseColor("#a2a3a3"));
@@ -202,7 +200,7 @@ public class MainActivity extends BaseFragActivity {
             case 2:
                 ivIndicators.get(0).setImageResource(R.mipmap.first);
                 tvIndicators.get(0).setTextColor(Color.parseColor("#a2a3a3"));
-                ivIndicators.get(1).setImageResource(R.mipmap.society);
+                ivIndicators.get(1).setImageResource(R.mipmap.club);
                 tvIndicators.get(1).setTextColor(Color.parseColor("#a2a3a3"));
                 ivIndicators.get(2).setImageResource(R.mipmap.discover_press);
                 tvIndicators.get(2).setTextColor(Color.parseColor("#5479b8"));
@@ -232,7 +230,7 @@ public class MainActivity extends BaseFragActivity {
         menu.setBehindCanvasTransformer(mTransformer);
         userLayout = (RelativeLayout) menu.findViewById(R.id.user_logol_layout);
         username = (TextView) menu.findViewById(R.id.user_name);
-        userLogol = (SimpleDraweeView) menu.findViewById(R.id.user_logol);
+        userLogo = (SimpleDraweeView) menu.findViewById(R.id.user_logol);
         colLayout = (RelativeLayout) menu.findViewById(R.id.col_layout);
         focusLayout = (RelativeLayout) menu.findViewById(R.id.focus_layout);
         Conf.isLogin = (boolean) SPUtil.get(this, "isLogin", false);
@@ -245,14 +243,18 @@ public class MainActivity extends BaseFragActivity {
             User user = User.load(this);
             ((MyApplication)getApplication()).setUser(user);
             username.setText(user.getName());
+            Log.i(TAG, "Avatar==========>" + user.getAvatar());
             if (user.getAvatar().equals("")) {
-                userLogol.setImageResource(R.mipmap.mine);
+                userLogo.setImageResource(R.mipmap.mine);
+                mainUserLogo.setImageResource(R.mipmap.mine);
             } else {
                 Uri uri = Uri.parse(user.getAvatar());
-                userLogol.setImageURI(uri);
+                userLogo.setImageURI(uri);
+                mainUserLogo.setImageURI(uri);
             }
         } else {
-            userLogol.setImageResource(R.mipmap.mine);
+            mainUserLogo.setImageResource(R.mipmap.mine);
+            userLogo.setImageResource(R.mipmap.mine);
             username.setText("未登录");
         }
     }
@@ -296,17 +298,17 @@ public class MainActivity extends BaseFragActivity {
             User user = ((MyApplication)getApplication()).getUser();
             username.setText(user.getName());
             if (user.getAvatar().equals("")) {
-                userLogol.setImageResource(R.mipmap.mine);
-                mainUserLogol.setImageResource(R.mipmap.mine);
+                userLogo.setImageResource(R.mipmap.mine);
+                mainUserLogo.setImageResource(R.mipmap.mine);
             } else {
                 Uri uri = Uri.parse(user.getAvatar());
-                userLogol.setImageURI(uri);
-                mainUserLogol.setImageURI(uri);
+                userLogo.setImageURI(uri);
+                mainUserLogo.setImageURI(uri);
             }
         } else if (requestCode == USER_INFO && resultCode == UserInfoActivity.LOGOUT) {
             username.setText("未登录");
-            userLogol.setImageResource(R.mipmap.mine);
-            mainUserLogol.setImageResource(R.mipmap.mine);
+            userLogo.setImageResource(R.mipmap.mine);
+            mainUserLogo.setImageResource(R.mipmap.mine);
         } else if (requestCode == SCAN_QR_CODE && resultCode == CaptureActivity.SCAN_SUCCESS) {
             Log.i(TAG, data.getStringExtra("result"));
 
@@ -325,12 +327,12 @@ public class MainActivity extends BaseFragActivity {
             if (intent.getAction().equals(ModifyUserInfoActivity.MODIFY_SUCCESS)) {
                 User user = ((MyApplication)getApplication()).getUser();
                 if (user.getAvatar().equals("")) {
-                    userLogol.setImageResource(R.mipmap.mine);
-                    mainUserLogol.setImageResource(R.mipmap.mine);
+                    userLogo.setImageResource(R.mipmap.mine);
+                    mainUserLogo.setImageResource(R.mipmap.mine);
                 } else {
                     Uri uri = Uri.parse(user.getAvatar());
-                    userLogol.setImageURI(uri);
-                    mainUserLogol.setImageURI(uri);
+                    userLogo.setImageURI(uri);
+                    mainUserLogo.setImageURI(uri);
                 }
             }
         }

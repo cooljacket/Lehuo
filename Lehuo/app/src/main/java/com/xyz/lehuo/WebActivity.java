@@ -1,4 +1,4 @@
-package com.xyz.lehuo.first;
+package com.xyz.lehuo;
 
 import android.os.Bundle;
 import android.view.View;
@@ -7,7 +7,6 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ImageView;
 
-import com.xyz.lehuo.R;
 import com.xyz.lehuo.global.BaseActivity;
 
 /**

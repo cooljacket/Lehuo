@@ -12,6 +12,7 @@ import android.os.Vibrator;
 import android.view.SurfaceHolder;
 import android.view.SurfaceHolder.Callback;
 import android.view.SurfaceView;
+import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.LinearInterpolator;
 import android.view.animation.TranslateAnimation;
@@ -54,6 +55,7 @@ public class CaptureActivity extends BaseActivity implements Callback {
 	private RelativeLayout mContainer = null;
 	private RelativeLayout mCropLayout = null;
 	private boolean isNeedCapture = false;
+	private ImageView back;
 	
 	public boolean isNeedCapture() {
 		return isNeedCapture;
@@ -117,6 +119,13 @@ public class CaptureActivity extends BaseActivity implements Callback {
 		mAnimation.setRepeatMode(Animation.REVERSE);
 		mAnimation.setInterpolator(new LinearInterpolator());
 		mQrLineView.setAnimation(mAnimation);
+		back = (ImageView) findViewById(R.id.back);
+		back.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				finish();
+			}
+		});
 	}
 
 	boolean flag = true;

@@ -81,14 +81,14 @@
             android:layout_weight="1">
 
             <ImageView
-                android:id="@+id/society"
+                android:id="@+id/club"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:scaleType="centerInside"
-                android:src="@mipmap/society"/>
+                android:src="@mipmap/club"/>
 
             <TextView
-                android:id="@+id/society_tv"
+                android:id="@+id/club_tv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="12sp"

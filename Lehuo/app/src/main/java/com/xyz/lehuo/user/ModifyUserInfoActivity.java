@@ -85,6 +85,7 @@ public class ModifyUserInfoActivity extends BaseActivity implements View.OnClick
 
     private void initData() {
         user = ((MyApplication) getApplication()).getUser();
+        userLogol.setImageURI(Uri.parse(user.getAvatar()));
         majorString = user.getMajor();
         gradeString = user.getGrade();
         sex = user.getSex();
@@ -156,12 +157,11 @@ public class ModifyUserInfoActivity extends BaseActivity implements View.OnClick
                 break;
             case R.id.sure:
                 List<NameValuePair> params = new ArrayList<NameValuePair>();
-                params.add(new BasicNameValuePair("old_name", user.getName()));
-                params.add(new BasicNameValuePair("old_pwd", user.getPwd()));
+                params.add(new BasicNameValuePair("uid", user.getUid()));
                 params.add(new BasicNameValuePair("sex", sex.equals("女") ? "0" : "1"));
                 params.add(new BasicNameValuePair("major", Constant.majorNum(majorString)));
                 params.add(new BasicNameValuePair("grade", Constant.gradeNum(gradeString)));
-                Log.i(TAG, "old_name: " + user.getName() + " old_pwd: " + user.getPwd() + " sex: " + (sex.equals("女") ? "0" : "1") + " major: " + Constant.majorNum(majorString) + " grade: " + Constant.gradeNum(gradeString));
+                Log.i(TAG, "uid: " + user.getUid() + " sex: " + (sex.equals("女") ? "0" : "1") + " major: " + Constant.majorNum(majorString) + " grade: " + Constant.gradeNum(gradeString));
                 new HttpUtil().create(HttpUtil.POST, Constant.UPDATE_USER_API, params, new HttpUtil.HttpCallBallListener() {
                     @Override
                     public void onStart() {

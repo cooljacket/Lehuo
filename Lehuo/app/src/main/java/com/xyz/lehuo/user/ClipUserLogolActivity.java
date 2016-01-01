@@ -86,9 +86,9 @@ public class ClipUserLogolActivity extends BaseActivity implements View.OnClickL
                     User user = ((MyApplication)getApplication()).getUser();
                     List<NameValuePair> params = new ArrayList<NameValuePair>();
                     params.add(new BasicNameValuePair("avatar", image));
-                    params.add(new BasicNameValuePair("old_name", user.getName()));
-                    params.add(new BasicNameValuePair("old_pwd", user.getPwd()));
-                    new HttpUtil().create(HttpUtil.POST, Constant.UPDATE_USER_LOGOL_API, params, new HttpUtil.HttpCallBallListener() {
+                    params.add(new BasicNameValuePair("uid", user.getUid()));
+                    Log.i(TAG, "uid====>" + user.getUid());
+                    new HttpUtil().create(HttpUtil.POST, Constant.UPDATE_USER_LOGO_API, params, new HttpUtil.HttpCallBallListener() {
                         @Override
                         public void onStart() {
                             pd = ProgressDialog.show(ClipUserLogolActivity.this, "提示", "上传头像");

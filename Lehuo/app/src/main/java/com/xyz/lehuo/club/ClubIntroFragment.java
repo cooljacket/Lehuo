@@ -1,4 +1,4 @@
-package com.xyz.lehuo.society;
+package com.xyz.lehuo.club;
 
 
 import android.app.Activity;
@@ -15,7 +15,7 @@ import com.xyz.lehuo.R;
 /**
  * Created by xyz on 15/12/30.
  */
-public class SocietyIntroFragment extends Fragment {
+public class ClubIntroFragment extends Fragment {
 
     private TextView intro;
     private Activity activity;
@@ -29,13 +29,13 @@ public class SocietyIntroFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_society_intro, null);
+        View view = inflater.inflate(R.layout.fragment_club_intro, null);
         initView(view);
         return view;
     }
 
     private void initView(View view) {
         intro = (TextView) view.findViewById(R.id.intro);
-        intro.setText(((SocietyDetailActivity)activity).intro);
+        intro.setText(((ClubDetailActivity)activity).intro);
     }
 }

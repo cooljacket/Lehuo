@@ -4,29 +4,27 @@ import android.content.Context;
 
 import com.xyz.lehuo.util.SPUtil;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by xyz on 15/12/18.
  */
 public class User {
 
-    private String id;
+    private String uid;
     private String name;
-    private String pwd;
     private String major;
     private String grade;
     private String avatar;
     private String sex;
+    private int colsNum;
+    private int focusNum;
+    private List<String> cols;
+    private List<String> focus;
 
     public User() {
 
-    }
-
-    public User(String avatar, String grade, String major, String name, String pwd) {
-        this.avatar = avatar;
-        this.grade = grade;
-        this.major = major;
-        this.name = name;
-        this.pwd = pwd;
     }
 
     public String getAvatar() {
@@ -69,20 +67,44 @@ public class User {
         this.sex = sex;
     }
 
-    public String getPwd() {
-        return pwd;
+    public String getUid() {
+        return uid;
     }
 
-    public void setPwd(String pwd) {
-        this.pwd = pwd;
+    public void setUid(String uid) {
+        this.uid = uid;
     }
 
-    public String getId() {
-        return id;
+    public List<String> getCols() {
+        return cols;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setCols(List<String> cols) {
+        this.cols = cols;
+    }
+
+    public List<String> getFocus() {
+        return focus;
+    }
+
+    public void setFocus(List<String> focus) {
+        this.focus = focus;
+    }
+
+    public int getColsNum() {
+        return colsNum;
+    }
+
+    public void setColsNum(int colsNum) {
+        this.colsNum = colsNum;
+    }
+
+    public int getFocusNum() {
+        return focusNum;
+    }
+
+    public void setFocusNum(int focusNum) {
+        this.focusNum = focusNum;
     }
 
     public static void save(Context context, User user) {
@@ -91,7 +113,15 @@ public class User {
         SPUtil.put(context, "grade", user.getGrade());
         SPUtil.put(context, "sex", user.getSex());
         SPUtil.put(context, "avatar_url", user.getAvatar());
-        SPUtil.put(context, "pwd", user.getPwd());
+        SPUtil.put(context, "uid", user.getUid());
+        SPUtil.put(context, "colsNum", user.getColsNum());
+        SPUtil.put(context, "focusNum", user.getFocusNum());
+        for (int i = 0; i < user.getCols().size(); i++) {
+            SPUtil.put(context, "col" + i, user.getCols().get(i));
+        }
+        for (int i = 0; i < user.getFocus().size(); i++) {
+            SPUtil.put(context, "focus" + i, user.getFocus().get(i));
+        }
     }
 
     public static User load(Context context) {
@@ -99,9 +129,21 @@ public class User {
         user.setName((String) SPUtil.get(context, "name", ""));
         user.setMajor((String) SPUtil.get(context, "major", ""));
         user.setGrade((String) SPUtil.get(context, "grade", ""));
-        user.setAvatar((String) SPUtil.get(context, "avatar", ""));
+        user.setAvatar((String) SPUtil.get(context, "avatar_url", ""));
         user.setSex((String) SPUtil.get(context, "sex", ""));
-        user.setPwd((String) SPUtil.get(context, "pwd", ""));
+        user.setUid((String) SPUtil.get(context, "uid", ""));
+        user.setColsNum((Integer) SPUtil.get(context, "colsNum", 0));
+        user.setFocusNum((Integer) SPUtil.get(context, "focusNum", 0));
+        List<String> cols = new ArrayList<String>();
+        List<String> focus = new ArrayList<String>();
+        for (int i = 0; i < user.getColsNum(); i++) {
+            cols.add((String) SPUtil.get(context, "col" + i, ""));
+        }
+        user.setCols(cols);
+        for (int i = 0; i < user.getFocusNum(); i++) {
+            focus.add((String) SPUtil.get(context, "focus" + i, ""));
+        }
+        user.setFocus(focus);
         return user;
     }
 
@@ -110,8 +152,18 @@ public class User {
         SPUtil.remove(context, "major");
         SPUtil.remove(context, "grade");
         SPUtil.remove(context, "sex");
-        SPUtil.remove(context, "avatar");
-        SPUtil.remove(context, "pwd");
+        SPUtil.remove(context, "avatar_url");
+        SPUtil.remove(context, "uid");
+        int colsNum = (int) SPUtil.get(context, "colsNum", 0);
+        int focusNum = (int) SPUtil.get(context, "focusNum", 0);
+        SPUtil.remove(context, "colsNum");
+        SPUtil.remove(context, "focusNum");
+        for (int i = 0; i < colsNum; i++) {
+            SPUtil.remove(context, "col" + i);
+        }
+        for (int i = 0; i < focusNum; i++) {
+            SPUtil.remove(context, "focus" + i);
+        }
     }
 
 }

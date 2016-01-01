@@ -36,4 +36,5 @@ dependencies {
     compile 'com.facebook.fresco:fresco:0.6.0+'
     compile 'com.nineoldandroids:library:2.4.0'
     compile 'com.android.support:support-v4:+'
+    compile 'com.android.support:recyclerview-v7:+'
 }
