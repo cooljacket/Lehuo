@@ -31,16 +31,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by xyz on 15/12/30.
+ * Created by xyz on 16/1/3.
  */
-public class CollectionAdapter extends BaseSwipeAdapter {
+public class LikeAdapter extends BaseSwipeAdapter {
 
     private Context context;
     private List<Activity> activities;
     private ProgressDialog pd;
     private User user;
 
-    public CollectionAdapter(Context context, List<Activity> activities) {
+    public LikeAdapter(Context context, List<Activity> activities) {
         this.context = context;
         this.activities = activities;
         user = ((MyApplication)(((android.app.Activity) context).getApplication())).getUser();
@@ -57,7 +57,7 @@ public class CollectionAdapter extends BaseSwipeAdapter {
     }
 
     @Override
-    public void fillValues(final int position, final View convertView) {
+    public void fillValues(final int position, View convertView) {
         final ZSwipeItem swipeItem = (ZSwipeItem) convertView.findViewById(R.id.swipe_item);
         LinearLayout ll = (LinearLayout) convertView.findViewById(R.id.ll);
         swipeItem.setShowMode(ShowMode.PullOut);
@@ -68,7 +68,7 @@ public class CollectionAdapter extends BaseSwipeAdapter {
                 List<NameValuePair> params = new ArrayList<NameValuePair>();
                 params.add(new BasicNameValuePair("uid", user.getUid()));
                 params.add(new BasicNameValuePair("aid", activities.get(position).getId()));
-                new HttpUtil().create(HttpUtil.POST, Constant.UN_COLLECT, params, new HttpUtil.HttpCallBallListener() {
+                new HttpUtil().create(HttpUtil.POST, Constant.UN_LIKE, params, new HttpUtil.HttpCallBallListener() {
                     @Override
                     public void onStart() {
                         pd = ProgressDialog.show(context, "提示", "加载中，请稍后");
@@ -89,7 +89,7 @@ public class CollectionAdapter extends BaseSwipeAdapter {
                         try {
                             JSONObject jsonObject = new JSONObject(result);
                             if (jsonObject.getInt("code") == 1) {
-                                user.cancleCol(activities.get(position).getId());
+                                user.cancleFocus(activities.get(position).getId());
                                 activities.remove(position);
                                 notifyDataSetChanged();
                                 swipeItem.close();
@@ -119,16 +119,17 @@ public class CollectionAdapter extends BaseSwipeAdapter {
 
     @Override
     public Object getItem(int position) {
-        return activities.get(position);
+        return null;
     }
 
     @Override
     public long getItemId(int position) {
-        return position;
+        return 0;
     }
 
     public void setData(List<Activity> activities) {
         this.activities = activities;
         notifyDataSetChanged();
     }
+
 }

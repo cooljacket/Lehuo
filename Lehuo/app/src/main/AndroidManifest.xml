@@ -35,6 +35,7 @@
         <activity android:name=".club.ClubDetailActivity"></activity>
         <activity android:name="com.zbar.lib.CaptureActivity"></activity>
         <activity android:name=".WebActivity"></activity>
+        <activity android:name=".user.LikeActivity"></activity>
     </application>
 
 </manifest>

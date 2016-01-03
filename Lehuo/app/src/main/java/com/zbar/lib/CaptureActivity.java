@@ -18,15 +18,25 @@ import android.view.animation.LinearInterpolator;
 import android.view.animation.TranslateAnimation;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
-import android.widget.Toast;
 
 import com.xyz.lehuo.R;
+import com.xyz.lehuo.WebActivity;
+import com.xyz.lehuo.bean.Activity;
 import com.xyz.lehuo.global.BaseActivity;
+import com.xyz.lehuo.global.Constant;
+import com.xyz.lehuo.util.HttpUtil;
 import com.zbar.lib.camera.CameraManager;
 import com.zbar.lib.decode.CaptureActivityHandler;
 import com.zbar.lib.decode.InactivityTimer;
 
+import org.apache.http.NameValuePair;
+import org.apache.http.message.BasicNameValuePair;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 作者: 陈涛(1076559197@qq.com)
@@ -38,8 +48,6 @@ import java.io.IOException;
  * 描述: 扫描界面
  */
 public class CaptureActivity extends BaseActivity implements Callback {
-
-	public static final int SCAN_SUCCESS = 41;
 
 	private CaptureActivityHandler handler;
 	private boolean hasSurface;
@@ -181,15 +189,53 @@ public class CaptureActivity extends BaseActivity implements Callback {
 	}
 
 	public void handleDecode(String result) {
-		inactivityTimer.onActivity();
-		playBeepSoundAndVibrate();
-		Toast.makeText(getApplicationContext(), result, Toast.LENGTH_SHORT).show();
-		// 连续扫描，不发送此消息扫描一次结束后就不能再次扫描
-		// handler.sendEmptyMessage(R.id.restart_preview);
-		Intent intent = new Intent();
-		intent.putExtra("result", result);
-		setResult(SCAN_SUCCESS, intent);
-		finish();
+		List<NameValuePair> params = new ArrayList<>();
+		params.add(new BasicNameValuePair("url", result));
+		new HttpUtil().create(HttpUtil.POST, Constant.GET_ACT_BY_SCAN, params, new HttpUtil.HttpCallBallListener() {
+			@Override
+			public void onStart() {
+
+			}
+
+			@Override
+			public void onFinish() {
+
+			}
+
+			@Override
+			public void onError() {
+
+			}
+
+			@Override
+			public void onSuccess(String result) {
+				try {
+					JSONObject jsonObject = new JSONObject(result);
+					if (jsonObject.getInt("code") == 1) {
+						inactivityTimer.onActivity();
+						playBeepSoundAndVibrate();
+						Activity activity = new Activity();
+						activity.setId(jsonObject.getString("id"));
+						activity.setDetailUrl(jsonObject.getString("detail_url"));
+						activity.setReadNum(Integer.parseInt(jsonObject.getString("read_nums")));
+						activity.setEndDate(jsonObject.getString("end_date"));
+						activity.setEndTime(jsonObject.getString("end_time"));
+						activity.setTitle(jsonObject.getString("title"));
+						activity.setImgUrl(jsonObject.getString("img_url"));
+						activity.setStartTime(jsonObject.getString("start_time"));
+						activity.setStartDate(jsonObject.getString("start_date"));
+						activity.setOrganizer(jsonObject.getString("organizer"));
+						activity.setType(jsonObject.getString("type"));
+						Intent intent = new Intent(CaptureActivity.this, WebActivity.class);
+						intent.putExtra("activity", activity);
+						startActivity(intent);
+						finish();
+					}
+				} catch (JSONException e) {
+					e.printStackTrace();
+				}
+			}
+		});
 	}
 
 	private void initCamera(SurfaceHolder surfaceHolder) {

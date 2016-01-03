@@ -11,7 +11,9 @@ public class Activity implements Serializable {
     private String title;
     private int readNum;
     private String startDate;
+    private String startTime;
     private String endDate;
+    private String endTime;
     private String openTime;
     private String sponsor;
     private String organizer;
@@ -132,5 +134,21 @@ public class Activity implements Serializable {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public String getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(String endTime) {
+        this.endTime = endTime;
+    }
+
+    public String getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(String startTime) {
+        this.startTime = startTime;
     }
 }

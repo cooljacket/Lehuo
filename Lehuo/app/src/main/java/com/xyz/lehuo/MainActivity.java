@@ -29,6 +29,7 @@ import com.xyz.lehuo.global.Conf;
 import com.xyz.lehuo.global.MyApplication;
 import com.xyz.lehuo.club.ClubFragment;
 import com.xyz.lehuo.user.CollectionActivity;
+import com.xyz.lehuo.user.LikeActivity;
 import com.xyz.lehuo.user.LoginActivity;
 import com.xyz.lehuo.user.ModifyUserInfoActivity;
 import com.xyz.lehuo.user.UserInfoActivity;
@@ -45,7 +46,6 @@ public class MainActivity extends BaseFragActivity {
 
     public static final int LOGIN = 1;
     public static final int USER_INFO = 2;
-    public static final int SCAN_QR_CODE = 3;
 
     List<Fragment> fragments = new ArrayList<Fragment>();
     FirstFragment firstFragment;
@@ -92,7 +92,7 @@ public class MainActivity extends BaseFragActivity {
         scan.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivityForResult(new Intent(MainActivity.this, CaptureActivity.class), SCAN_QR_CODE);
+                startActivity(new Intent(MainActivity.this, CaptureActivity.class));
             }
         });
 
@@ -286,7 +286,7 @@ public class MainActivity extends BaseFragActivity {
                 if (Conf.isLogin == false) {
                     Toast.makeText(MainActivity.this, "请先登录", Toast.LENGTH_SHORT).show();
                 } else {
-
+                    startActivity(new Intent(MainActivity.this, LikeActivity.class));
                 }
             }
         });
@@ -309,9 +309,6 @@ public class MainActivity extends BaseFragActivity {
             username.setText("未登录");
             userLogo.setImageResource(R.mipmap.mine);
             mainUserLogo.setImageResource(R.mipmap.mine);
-        } else if (requestCode == SCAN_QR_CODE && resultCode == CaptureActivity.SCAN_SUCCESS) {
-            Log.i(TAG, data.getStringExtra("result"));
-
         }
     }
 

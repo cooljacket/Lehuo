@@ -1,6 +1,7 @@
 package com.xyz.lehuo;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -32,6 +33,9 @@ import java.util.List;
 public class WebActivity extends BaseActivity implements View.OnClickListener {
 
     public static final String TAG = "WebActivity";
+
+    public static final String COLLECT_CHANGE = "collect_change";
+    public static final String LIKE_CHANGE = "like_change";
 
     private ImageView col;
     private ImageView like;
@@ -124,6 +128,7 @@ public class WebActivity extends BaseActivity implements View.OnClickListener {
         List<NameValuePair> params = new ArrayList<>();
         params.add(new BasicNameValuePair("uid", user.getUid()));
         params.add(new BasicNameValuePair("aid", activity.getId()));
+        Log.i(TAG, "uid===========>" + user.getUid() + " aid=============>" + activity.getId());
         if (isCollect) {
             url = Constant.UN_COLLECT;
         } else {
@@ -157,11 +162,17 @@ public class WebActivity extends BaseActivity implements View.OnClickListener {
                         Toast.makeText(WebActivity.this, "取消收藏", Toast.LENGTH_SHORT).show();
                         isCollect = false;
                         user.cancleCol(activity.getId());
+                        col.setImageResource(R.mipmap.collection);
                     } else {
                         Toast.makeText(WebActivity.this, "收藏成功", Toast.LENGTH_SHORT).show();
                         isCollect = true;
                         user.addCollection(activity.getId());
+                        col.setImageResource(R.mipmap.collection_pressed);
                     }
+                    Intent intent = new Intent();
+                    intent.setAction(COLLECT_CHANGE);
+                    intent.putExtra("activityId", activity.getId());
+                    sendBroadcast(intent);
                 } else {
                     if (isCollect) {
                         Toast.makeText(WebActivity.this, "取消失败", Toast.LENGTH_SHORT).show();
@@ -220,6 +231,10 @@ public class WebActivity extends BaseActivity implements View.OnClickListener {
                         user.addFocus(activity.getId());
                         like.setImageResource(R.mipmap.like_pressed);
                     }
+                    Intent intent = new Intent();
+                    intent.putExtra("activityId", activity.getId());
+                    intent.setAction(LIKE_CHANGE);
+                    sendBroadcast(intent);
                 } else {
                     if (isLike) {
                         Toast.makeText(WebActivity.this, "取消失败", Toast.LENGTH_SHORT).show();

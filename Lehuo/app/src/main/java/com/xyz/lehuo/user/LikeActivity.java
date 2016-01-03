@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ImageView;
@@ -33,17 +32,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by xyz on 15/12/30.
+ * Created by xyz on 16/1/3.
  */
-public class CollectionActivity extends BaseActivity {
-
-    public static final String TAG = "CollectionActivity";
+public class LikeActivity extends BaseActivity {
 
     ListView listView;
-    SwipeRefreshLayout refreshLayout;
     List<Activity> activities = new ArrayList<Activity>();
-    CollectionAdapter adapter;
+    LikeAdapter adapter;
     ImageView back;
+    SwipeRefreshLayout refreshLayout;
     ProgressDialog pd;
     User user;
 
@@ -57,13 +54,14 @@ public class CollectionActivity extends BaseActivity {
     }
 
     private void initView() {
+        refreshLayout = (SwipeRefreshLayout) findViewById(R.id.refresh_layout);
         back = (ImageView) findViewById(R.id.back);
         listView = (ListView) findViewById(R.id.listview);
-        adapter = new CollectionAdapter(this, activities);
+        adapter = new LikeAdapter(this, activities);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent intent = new Intent(CollectionActivity.this, WebActivity.class);
+                Intent intent = new Intent(LikeActivity.this, WebActivity.class);
                 intent.putExtra("activity", activities.get(position));
                 startActivity(intent);
             }
@@ -72,10 +70,9 @@ public class CollectionActivity extends BaseActivity {
         back.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                CollectionActivity.this.finish();
+                LikeActivity.this.finish();
             }
         });
-        refreshLayout = (SwipeRefreshLayout) findViewById(R.id.refresh_layout);
         refreshLayout.setColorSchemeResources(android.R.color.holo_green_dark,
                 android.R.color.holo_green_light, android.R.color.holo_orange_light,
                 android.R.color.holo_red_light);
@@ -84,8 +81,7 @@ public class CollectionActivity extends BaseActivity {
             public void onRefresh() {
                 List<NameValuePair> params = new ArrayList<>();
                 params.add(new BasicNameValuePair("uid", user.getUid()));
-                Log.i(TAG, "uid==============>" + user.getUid());
-                new HttpUtil().create(HttpUtil.POST, Constant.GET_USER_COLLECT_ACTS, params, new HttpUtil.HttpCallBallListener() {
+                new HttpUtil().create(HttpUtil.POST, Constant.GET_USER_LIKE_ACTS, params, new HttpUtil.HttpCallBallListener() {
                     @Override
                     public void onStart() {
                     }
@@ -97,7 +93,7 @@ public class CollectionActivity extends BaseActivity {
 
                     @Override
                     public void onError() {
-                        Toast.makeText(CollectionActivity.this, "网络错误", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(LikeActivity.this, "网络错误", Toast.LENGTH_SHORT).show();
                     }
 
                     @Override
@@ -110,14 +106,13 @@ public class CollectionActivity extends BaseActivity {
     }
 
     private void initData() {
-        user = ((MyApplication)getApplication()).getUser();
+        user = ((MyApplication) getApplication()).getUser();
         List<NameValuePair> params = new ArrayList<>();
         params.add(new BasicNameValuePair("uid", user.getUid()));
-        Log.i(TAG, "uid==============>" + user.getUid());
-        new HttpUtil().create(HttpUtil.POST, Constant.GET_USER_COLLECT_ACTS, params, new HttpUtil.HttpCallBallListener() {
+        new HttpUtil().create(HttpUtil.POST, Constant.GET_USER_LIKE_ACTS, params, new HttpUtil.HttpCallBallListener() {
             @Override
             public void onStart() {
-                pd = ProgressDialog.show(CollectionActivity.this, "提示", "加载中，请稍后");
+                pd = ProgressDialog.show(LikeActivity.this, "提示", "加载中，请稍后");
             }
 
             @Override
@@ -127,7 +122,7 @@ public class CollectionActivity extends BaseActivity {
 
             @Override
             public void onError() {
-                Toast.makeText(CollectionActivity.this, "网络错误", Toast.LENGTH_SHORT).show();
+                Toast.makeText(LikeActivity.this, "网络错误", Toast.LENGTH_SHORT).show();
             }
 
             @Override
@@ -160,7 +155,7 @@ public class CollectionActivity extends BaseActivity {
                 }
                 adapter.setData(activities);
             } else {
-                Toast.makeText(CollectionActivity.this, "服务器错误", Toast.LENGTH_SHORT).show();
+                Toast.makeText(LikeActivity.this, "服务器错误", Toast.LENGTH_SHORT).show();
             }
         } catch (JSONException e) {
             e.printStackTrace();
@@ -169,7 +164,7 @@ public class CollectionActivity extends BaseActivity {
 
     private void initBroadcast() {
         IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(WebActivity.COLLECT_CHANGE);
+        intentFilter.addAction(WebActivity.LIKE_CHANGE);
         registerReceiver(mBroadcast, intentFilter);
     }
 
@@ -182,7 +177,7 @@ public class CollectionActivity extends BaseActivity {
     BroadcastReceiver mBroadcast = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if (intent.getAction().equals(WebActivity.COLLECT_CHANGE)) {
+            if (intent.getAction().equals(WebActivity.LIKE_CHANGE)) {
                 for (Activity a : activities) {
                     if (a.getId().equals(intent.getStringExtra("activityId"))) {
                         activities.remove(a);

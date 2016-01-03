@@ -18,7 +18,15 @@ import android.widget.Toast;
 
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.xyz.lehuo.R;
+import com.xyz.lehuo.bean.Activity;
+import com.xyz.lehuo.datebase.DatabaseManager;
+import com.xyz.lehuo.global.Constant;
 import com.xyz.lehuo.util.HttpUtil;
+
+import org.apache.http.NameValuePair;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,11 +45,13 @@ public class FirstFragment extends Fragment {
     private BannerAdapter bannerAdapter;
     private List<String> bannerUrls = new ArrayList<String>();
     private ProgressDialog pd;
+    private DatabaseManager databaseManager;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_first, container, false);
+        databaseManager = new DatabaseManager(getActivity());
         initView(view);
         initListener();
         initData();
@@ -56,23 +66,13 @@ public class FirstFragment extends Fragment {
         listView.addHeaderView(headView);
         adapter = new FirstAdapter(activities, getActivity());
         listView.setAdapter(adapter);
+        bannerAdapter = new BannerAdapter(getActivity(), bannerUrls);
+        vp.setAdapter(bannerAdapter);
     }
 
     private void initData() {
-        activities.clear();
-        for (int i = 0; i < 2; i++) {
-            com.xyz.lehuo.bean.Activity activity = new com.xyz.lehuo.bean.Activity();
-            activity.setTitle("奔跑奔跑｜奔跑奔跑奔跑奔跑奔跑奔跑");
-            activity.setEndDate("12.25");
-            activity.setReadNum(1000);
-            activity.setOrganizer("中山大学东校区数据学院发展中心");
-            activity.setImgUrl("http://img.my.csdn.net/uploads/201309/01/1378037235_3453.jpg");
-            activities.add(activity);
-            bannerUrls.add("http://img.my.csdn.net/uploads/201309/01/1378037235_3453.jpg");
-        }
-        bannerAdapter = new BannerAdapter(getActivity(), bannerUrls);
-        vp.setAdapter(bannerAdapter);
-        adapter.setData(activities);
+        List<NameValuePair> params = new ArrayList<>();
+        new HttpUtil().create(HttpUtil.POST, Constant.GET_RECOMMEND__ACTS, params, getData);
     }
 
     private void initListener() {
@@ -82,21 +82,63 @@ public class FirstFragment extends Fragment {
         refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-
-                refreshLayout.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        refreshLayout.setRefreshing(false);
-                        initData();
-                    }
-                }, 1000);
+                List<NameValuePair> params = new ArrayList<>();
+                new HttpUtil().create(HttpUtil.POST, Constant.GET_RECOMMEND__ACTS, params, refreshData);
             }
         });
-
     }
 
     private void dealResult(String result) {
-
+        try {
+            JSONObject jsonObject = new JSONObject(result);
+            if (jsonObject.getInt("code") == 1) {
+                List<Activity> allActivities = new ArrayList<>();
+                activities.clear();
+                bannerUrls.clear();
+                JSONArray array = jsonObject.getJSONArray("data");
+                for (int i = 0; i < array.length(); i++) {
+                    Activity activity = new Activity();
+                    JSONObject jo = array.optJSONObject(i);
+                    activity.setId(jo.getString("id"));
+                    activity.setDetailUrl(jo.getString("detail_url"));
+                    activity.setReadNum(Integer.parseInt(jo.getString("read_nums")));
+                    activity.setEndDate(jo.getString("end_date"));
+                    activity.setEndTime(jo.getString("end_time"));
+                    activity.setTitle(jo.getString("title"));
+                    activity.setImgUrl(jo.getString("img_url"));
+                    activity.setStartTime(jo.getString("start_time"));
+                    activity.setStartDate(jo.getString("start_date"));
+                    activity.setOrganizer(jo.getString("organizer"));
+                    activity.setType(jo.getString("type"));
+                    allActivities.add(activity);
+                    if (i < 5) {
+                        bannerUrls.add(activity.getImgUrl());
+                    } else {
+                        activities.add(activity);
+                    }
+                }
+                databaseManager.clearActivityTable();
+                databaseManager.addActivities(allActivities);
+                adapter.setData(activities);
+                bannerAdapter.setData(bannerUrls);
+            } else {
+                Toast.makeText(getActivity(), "服务器错误", Toast.LENGTH_SHORT).show();
+                bannerUrls.clear();
+                activities.clear();
+                List<Activity> allActivities = databaseManager.getAllActivities();
+                for (int i = 0; i < allActivities.size(); i++) {
+                    if (i < 5) {
+                        bannerUrls.add(allActivities.get(i).getImgUrl());
+                    } else {
+                        activities.add(allActivities.get(i));
+                    }
+                }
+                bannerAdapter.setData(bannerUrls);
+                adapter.setData(activities);
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     HttpUtil.HttpCallBallListener getData = new HttpUtil.HttpCallBallListener() {
@@ -113,6 +155,18 @@ public class FirstFragment extends Fragment {
         @Override
         public void onError() {
             Toast.makeText(getActivity(), "网络错误", Toast.LENGTH_SHORT).show();
+            bannerUrls.clear();
+            activities.clear();
+            List<Activity> allActivities = databaseManager.getAllActivities();
+            for (int i = 0; i < allActivities.size(); i++) {
+                if (i < 5) {
+                    bannerUrls.add(allActivities.get(i).getImgUrl());
+                } else {
+                    activities.add(allActivities.get(i));
+                }
+            }
+            bannerAdapter.setData(bannerUrls);
+            adapter.setData(activities);
         }
 
         @Override
@@ -123,9 +177,7 @@ public class FirstFragment extends Fragment {
 
     HttpUtil.HttpCallBallListener refreshData = new HttpUtil.HttpCallBallListener() {
         @Override
-        public void onStart() {
-
-        }
+        public void onStart() {}
 
         @Override
         public void onFinish() {
@@ -135,6 +187,18 @@ public class FirstFragment extends Fragment {
         @Override
         public void onError() {
             Toast.makeText(getActivity(), "网络错误", Toast.LENGTH_SHORT).show();
+            bannerUrls.clear();
+            activities.clear();
+            List<Activity> allActivities = databaseManager.getAllActivities();
+            for (int i = 0; i < allActivities.size(); i++) {
+                if (i < 5) {
+                    bannerUrls.add(allActivities.get(i).getImgUrl());
+                } else {
+                    activities.add(allActivities.get(i));
+                }
+            }
+            bannerAdapter.setData(bannerUrls);
+            adapter.setData(activities);
         }
 
         @Override
@@ -180,7 +244,7 @@ public class FirstFragment extends Fragment {
             SimpleDraweeView image = imageViews.get(position);
             ViewParent vp = image.getParent();
             if (vp != null) {
-                ((ViewGroup)vp).removeView(image);
+                ((ViewGroup) vp).removeView(image);
             }
             container.addView(image);
             return image;
@@ -193,6 +257,14 @@ public class FirstFragment extends Fragment {
 
         public void setData(List<String> urls) {
             this.urls = urls;
+            if (imageViews.size() < urls.size()) {
+                for (int i = imageViews.size(); i < urls.size(); i++) {
+                    Uri uri = Uri.parse(urls.get(i));
+                    SimpleDraweeView view = new SimpleDraweeView(context, null, R.style.banner_image);
+                    view.setImageURI(uri);
+                    imageViews.add(view);
+                }
+            }
             notifyDataSetChanged();
         }
     }

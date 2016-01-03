@@ -30,11 +30,15 @@ public class DatabaseManager {
         cv.put("activityId", activity.getId());
         cv.put("title", activity.getTitle());
         cv.put("readnum", activity.getReadNum());
-        cv.put("enddate", activity.getEndDate());
+        cv.put("endDate", activity.getEndDate());
+        cv.put("startDate", activity.getStartDate());
+        cv.put("endTime", activity.getEndTime());
+        cv.put("startTime", activity.getStartTime());
         cv.put("organizer", activity.getOrganizer());
         cv.put("imgUrl", activity.getImgUrl());
         cv.put("detailUrl", activity.getDetailUrl());
-        mDatabase.insert(Constant.CLUB_TABLE_NAME, null, cv);
+        cv.put("type", activity.getType());
+        mDatabase.insert(Constant.ACTIVITY_TABLE_NAME, null, cv);
     }
 
     public void addActivities(List<Activity> activities) {
@@ -59,10 +63,14 @@ public class DatabaseManager {
             activity.setId(c.getString(c.getColumnIndex("activityId")));
             activity.setTitle(c.getString(c.getColumnIndex("title")));
             activity.setReadNum(c.getInt(c.getColumnIndex("readnum")));
-            activity.setEndDate(c.getString(c.getColumnIndex("enddate")));
+            activity.setEndDate(c.getString(c.getColumnIndex("endDate")));
             activity.setOrganizer(c.getString(c.getColumnIndex("organizer")));
             activity.setImgUrl(c.getString(c.getColumnIndex("imgUrl")));
             activity.setDetailUrl(c.getString(c.getColumnIndex("detailUrl")));
+            activity.setEndTime(c.getString(c.getColumnIndex("endTime")));
+            activity.setStartDate(c.getString(c.getColumnIndex("startDate")));
+            activity.setStartTime(c.getString(c.getColumnIndex("startTime")));
+            activity.setType(c.getString(c.getColumnIndex("type")));
             activities.add(activity);
         }
         c.close();

@@ -19,6 +19,10 @@ public class Constant {
     public static final String UN_COLLECT = SERVER_ADDRESS + "/api/user/uncollect";
     public static final String LIKE = SERVER_ADDRESS + "/api/user/like";
     public static final String UN_LIKE = SERVER_ADDRESS + "/api/user/unlike";
+    public static final String GET_RECOMMEND__ACTS = SERVER_ADDRESS + "/api/activity/get_recommend_acts";
+    public static final String GET_USER_COLLECT_ACTS = SERVER_ADDRESS + "/api/activity/get_user_collect_acts";
+    public static final String GET_USER_LIKE_ACTS = SERVER_ADDRESS + "/api/activity/get_user_like_acts";
+    public static final String GET_ACT_BY_SCAN = SERVER_ADDRESS + "/api/activity/get_act_by_url";
 
     public static final String DATABASE_NAME = "lehuo.db";
     public static final String ACTIVITY_TABLE_NAME = "activity";

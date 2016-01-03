@@ -20,10 +20,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE IF NOT EXISTS " + Constant.ACTIVITY_TABLE_NAME
-                 + "(rowid INTEGER PRIMARY KET AUTOINCREMENT, "
-                 + "activityId TEXT, title TEXT, readnum INTEGER, enddate TEXT, organizer TEXT, imgUrl TEXT, detailUrl TEXT);");
+                 + "(rowid INTEGER PRIMARY KEY AUTOINCREMENT, "
+                 + "activityId TEXT, title TEXT,"
+                 + " readnum INTEGER, endDate TEXT,"
+                 + " organizer TEXT, imgUrl TEXT,"
+                 + " detailUrl TEXT, startDate TEXT,"
+                 + " endTime TEXT, startTime TEXT,"
+                 + " type TEXT);");
         db.execSQL("CREATE TABLE IF NOT EXISTS " + Constant.CLUB_TABLE_NAME
-                 + "rowid INTEGER PRIMARY KEY AUTOINCREMENT, "
+                 + "(rowid INTEGER PRIMARY KEY AUTOINCREMENT, "
                  + "clubId TEXT, name TEXT, imgUrl TEXT);");
     }
 

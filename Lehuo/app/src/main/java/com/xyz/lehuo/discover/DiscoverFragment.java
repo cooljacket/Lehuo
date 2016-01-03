@@ -107,25 +107,21 @@ public class DiscoverFragment extends Fragment implements RadioGroup.OnCheckedCh
         switch (checkedId) {
             case R.id.display:
                 type = "0";
-                Toast.makeText(getActivity(), "展览", Toast.LENGTH_SHORT).show();
                 params.add(new BasicNameValuePair("type", type));
                 new HttpUtil().create(HttpUtil.POST, Constant.GET_SOME_ACTS_BY_TYPE, params, getNewDataCallBack);
                 break;
             case R.id.lecture:
                 type = "1";
-                Toast.makeText(getActivity(), "讲座", Toast.LENGTH_SHORT).show();
                 params.add(new BasicNameValuePair("type", type));
                 new HttpUtil().create(HttpUtil.POST, Constant.GET_SOME_ACTS_BY_TYPE, params, getNewDataCallBack);
                 break;
             case R.id.recruit:
                 type = "2";
-                Toast.makeText(getActivity(), "招聘", Toast.LENGTH_SHORT).show();
                 params.add(new BasicNameValuePair("type", type));
                 new HttpUtil().create(HttpUtil.POST, Constant.GET_SOME_ACTS_BY_TYPE, params, getNewDataCallBack);
                 break;
             case R.id.benefit:
                 type = "3";
-                Toast.makeText(getActivity(), "公益", Toast.LENGTH_SHORT).show();
                 params.add(new BasicNameValuePair("type", type));
                 new HttpUtil().create(HttpUtil.POST, Constant.GET_SOME_ACTS_BY_TYPE, params, getNewDataCallBack);
                 break;
@@ -169,7 +165,7 @@ public class DiscoverFragment extends Fragment implements RadioGroup.OnCheckedCh
                     for (int i = 0; i < data.length(); i++) {
                         JSONObject jo = data.optJSONObject(i);
                         Activity activity = new Activity();
-                        activity.setId(jo.getString("_id").substring(9, jo.getString("_id").length() - 2));
+                        activity.setId(jo.getString("id"));
                         activity.setReadNum(Integer.parseInt(jo.getString("read_nums")));
                         activity.setEndDate(jo.getString("end_date"));
                         activity.setTitle(jo.getString("title"));
@@ -214,14 +210,17 @@ public class DiscoverFragment extends Fragment implements RadioGroup.OnCheckedCh
                     for (int i = 0; i < data.length(); i++) {
                         JSONObject jo = data.optJSONObject(i);
                         Activity activity = new Activity();
-                        activity.setId(jo.getString("_id").substring(9, jo.getString("_id").length() - 2));
+                        activity.setId(jo.getString("id"));
                         activity.setReadNum(Integer.parseInt(jo.getString("read_nums")));
                         activity.setEndDate(jo.getString("end_date"));
                         activity.setTitle(jo.getString("title"));
                         activity.setStartDate(jo.getString("start_date"));
+                        activity.setStartTime(jo.getString("start_time"));
                         activity.setOrganizer(jo.getString("organizer"));
                         activity.setDetailUrl(jo.getString("detail_url"));
                         activity.setImgUrl(jo.getString("img_url"));
+                        activity.setEndTime(jo.getString("end_time"));
+                        activity.setType(jo.getString("type"));
                         activities.add(activity);
                     }
                     adapter.setData(activities);

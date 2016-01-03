@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,6 +21,7 @@ import android.widget.Toast;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.xyz.lehuo.R;
 import com.xyz.lehuo.bean.Club;
+import com.xyz.lehuo.datebase.DatabaseManager;
 import com.xyz.lehuo.global.Constant;
 import com.xyz.lehuo.util.HttpUtil;
 
@@ -39,13 +41,16 @@ public class ClubFragment extends Fragment {
     private ListView list;
     private MyAdapter adapter;
     private List<Club> clubs;
-//    private DatabaseManager databaseManager = new DatabaseManager(getActivity());
+    private DatabaseManager databaseManager;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_club, container, false);
+        databaseManager = new DatabaseManager(getActivity());
         initView(view);
+        initData();
+        initListener();
         return view;
     }
 
@@ -55,8 +60,6 @@ public class ClubFragment extends Fragment {
         clubs = new ArrayList<Club>();
         adapter = new MyAdapter(getActivity(), clubs);
         list.setAdapter(adapter);
-        initData();
-        initListener();
     }
 
     private void initData() {
@@ -74,8 +77,9 @@ public class ClubFragment extends Fragment {
             @Override
             public void onError() {
                 Toast.makeText(getActivity(), "网络错误", Toast.LENGTH_SHORT).show();
-//                clubs = databaseManager.getAllClubs();
+                clubs = databaseManager.getAllClubs();
                 adapter.setData(clubs);
+                Log.i(TAG, "club size============>" + clubs.size());
             }
 
             @Override
@@ -83,6 +87,7 @@ public class ClubFragment extends Fragment {
                 try {
                     JSONObject jsonObject = new JSONObject(result);
                     if (jsonObject.getInt("code") == 1) {
+                        clubs.clear();
                         JSONArray data = jsonObject.getJSONArray("data");
                         for (int i = 0; i < data.length(); i++) {
                             JSONObject jo = data.optJSONObject(i);
@@ -93,12 +98,12 @@ public class ClubFragment extends Fragment {
                             club.setImgUrl(jo.getString("img_url"));
                             clubs.add(club);
                         }
-//                        databaseManager.clearClubTable();
-//                        databaseManager.addClubs(clubs);
+                        databaseManager.clearClubTable();
+                        databaseManager.addClubs(clubs);
                         adapter.setData(clubs);
                     } else {
                         Toast.makeText(getActivity(), "服务器错误", Toast.LENGTH_SHORT).show();
-//                        clubs = databaseManager.getAllClubs();
+                        clubs = databaseManager.getAllClubs();
                         adapter.setData(clubs);
                     }
                 } catch (JSONException e) {

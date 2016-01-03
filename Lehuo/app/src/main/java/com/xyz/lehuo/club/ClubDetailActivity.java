@@ -185,20 +185,23 @@ public class ClubDetailActivity extends BaseFragActivity implements View.OnClick
                         for (int i = 0; i < data.length(); i++) {
                             JSONObject jo = data.optJSONObject(i);
                             Activity activity = new Activity();
-                            activity.setId(jo.getString("_id").substring(9, jo.getString("_id").length() - 2));
+                            activity.setId(jo.getString("id"));
+                            activity.setDetailUrl(jo.getString("detail_url"));
                             activity.setReadNum(Integer.parseInt(jo.getString("read_nums")));
                             activity.setEndDate(jo.getString("end_date"));
+                            activity.setEndTime(jo.getString("end_time"));
                             activity.setTitle(jo.getString("title"));
-                            activity.setOrganizer(jo.getString("organizer"));
-                            activity.setDetailUrl(jo.getString("detail_url"));
                             activity.setImgUrl(jo.getString("img_url"));
+                            activity.setStartTime(jo.getString("start_time"));
+                            activity.setStartDate(jo.getString("start_date"));
+                            activity.setOrganizer(jo.getString("organizer"));
+                            activity.setType(jo.getString("type"));
                             club.getActivities().add(activity);
                             if (i <= 4) {
                                 club.getRecentActivities().add(activity);
                             }
                         }
                         allActivityFragment.setData(club.getActivities());
-                        //allActivityFragment.adapter.setData(club.getActivities());
                         recentActivityFragment.setData(club.getRecentActivities());
                     } else {
                         Toast.makeText(ClubDetailActivity.this, "服务器错误", Toast.LENGTH_SHORT).show();

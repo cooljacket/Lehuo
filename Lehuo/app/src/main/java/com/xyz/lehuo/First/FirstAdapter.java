@@ -52,6 +52,7 @@ public class FirstAdapter extends BaseAdapter {
             viewHolder.endDate = (TextView) view.findViewById(R.id.end_date);
             viewHolder.readNum = (TextView) view.findViewById(R.id.read_num);
             viewHolder.organizer = (TextView) view.findViewById(R.id.organizer);
+            viewHolder.endTime = (TextView) view.findViewById(R.id.end_time);
             viewHolder.img = (SimpleDraweeView) view.findViewById(R.id.activity_img);
             view.setTag(viewHolder);
         } else {
@@ -61,6 +62,7 @@ public class FirstAdapter extends BaseAdapter {
         viewHolder.organizer.setText(activities.get(i).getOrganizer());
         viewHolder.readNum.setText(activities.get(i).getReadNum() + "");
         viewHolder.endDate.setText(activities.get(i).getEndDate());
+        viewHolder.endTime.setText(activities.get(i).getEndTime());
         Uri uri = Uri.parse(activities.get(i).getImgUrl());
         viewHolder.img.setImageURI(uri);
         return view;
@@ -69,6 +71,7 @@ public class FirstAdapter extends BaseAdapter {
     class ViewHolder {
         TextView title;
         TextView endDate;
+        TextView endTime;
         TextView readNum;
         TextView organizer;
         SimpleDraweeView img;
