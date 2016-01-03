@@ -69,6 +69,10 @@ public class DatabaseManager {
         return activities;
     }
 
+    public void clearActivityTable() {
+        mDatabase.execSQL("DELETE FROM " + Constant.ACTIVITY_TABLE_NAME);
+    }
+
     public void addClub(Club club) {
         ContentValues cv = new ContentValues();
         cv.put("clubId", club.getId());
@@ -103,5 +107,9 @@ public class DatabaseManager {
         }
         c.close();
         return clubs;
+    }
+
+    public void clearClubTable() {
+        mDatabase.execSQL("DELETE FROM " + Constant.CLUB_TABLE_NAME);
     }
 }

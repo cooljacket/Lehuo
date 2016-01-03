@@ -11,12 +11,21 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.xyz.lehuo.R;
 import com.xyz.lehuo.bean.Activity;
 import com.xyz.lehuo.bean.Club;
 import com.xyz.lehuo.global.BaseFragActivity;
+import com.xyz.lehuo.global.Constant;
+import com.xyz.lehuo.util.HttpUtil;
+
+import org.apache.http.NameValuePair;
+import org.apache.http.message.BasicNameValuePair;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,17 +42,14 @@ public class ClubDetailActivity extends BaseFragActivity implements View.OnClick
     private List<Fragment> fragments = new ArrayList<Fragment>();
     private ClubIntroFragment introFragment;
     private ClubAllFragment allActivityFragment;
-    private ClubAllFragment recentActivityFragment;
+    private ClubRecentFragment recentActivityFragment;
     private FragmentPagerAdapter adapter;
     private List<TextView> tvIndicators = new ArrayList<TextView>();
     private List<View> vIndicators = new ArrayList<View>();
-    private Club club;
 
     private ProgressDialog pd;
 
-    String intro = "";
-    List<Activity> allActivities = new ArrayList<Activity>();
-    List<Activity> recentActivities = new ArrayList<Activity>();
+    Club club;
 
 
     @Override
@@ -52,12 +58,13 @@ public class ClubDetailActivity extends BaseFragActivity implements View.OnClick
         setContentView(R.layout.activity_club_detail);
         initData();
         initView();
+        getAllActivitiesByClub();
     }
 
     private void initData() {
         introFragment = new ClubIntroFragment();
         allActivityFragment = new ClubAllFragment();
-        recentActivityFragment = new ClubAllFragment();
+        recentActivityFragment = new ClubRecentFragment();
         fragments.add(introFragment);
         fragments.add(allActivityFragment);
         fragments.add(recentActivityFragment);
@@ -73,7 +80,6 @@ public class ClubDetailActivity extends BaseFragActivity implements View.OnClick
             }
         };
         club = (Club) getIntent().getSerializableExtra("club");
-
     }
 
     private void initView() {
@@ -149,6 +155,59 @@ public class ClubDetailActivity extends BaseFragActivity implements View.OnClick
                 vIndicators.get(2).setVisibility(View.VISIBLE);
                 break;
         }
+    }
+
+    private void getAllActivitiesByClub() {
+        List<NameValuePair> params = new ArrayList<NameValuePair>();
+        params.add(new BasicNameValuePair("cname", club.getName()));
+        new HttpUtil().create(HttpUtil.POST, Constant.GET_ALL_ACTS_BY_CLUB, params, new HttpUtil.HttpCallBallListener() {
+            @Override
+            public void onStart() {
+                pd = ProgressDialog.show(ClubDetailActivity.this, "提示", "加载中，请稍后");
+            }
+
+            @Override
+            public void onFinish() {
+                pd.cancel();
+            }
+
+            @Override
+            public void onError() {
+                Toast.makeText(ClubDetailActivity.this, "网络错误", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onSuccess(String result) {
+                try {
+                    JSONObject jsonObject = new JSONObject(result);
+                    if (jsonObject.getInt("code") == 1) {
+                        JSONArray data = jsonObject.getJSONArray("data");
+                        for (int i = 0; i < data.length(); i++) {
+                            JSONObject jo = data.optJSONObject(i);
+                            Activity activity = new Activity();
+                            activity.setId(jo.getString("_id").substring(9, jo.getString("_id").length() - 2));
+                            activity.setReadNum(Integer.parseInt(jo.getString("read_nums")));
+                            activity.setEndDate(jo.getString("end_date"));
+                            activity.setTitle(jo.getString("title"));
+                            activity.setOrganizer(jo.getString("organizer"));
+                            activity.setDetailUrl(jo.getString("detail_url"));
+                            activity.setImgUrl(jo.getString("img_url"));
+                            club.getActivities().add(activity);
+                            if (i <= 4) {
+                                club.getRecentActivities().add(activity);
+                            }
+                        }
+                        allActivityFragment.setData(club.getActivities());
+                        //allActivityFragment.adapter.setData(club.getActivities());
+                        recentActivityFragment.setData(club.getRecentActivities());
+                    } else {
+                        Toast.makeText(ClubDetailActivity.this, "服务器错误", Toast.LENGTH_SHORT).show();
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 
     @Override

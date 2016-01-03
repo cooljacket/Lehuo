@@ -24,7 +24,8 @@ public class User {
     private List<String> focus;
 
     public User() {
-
+        cols = new ArrayList<String>();
+        focus = new ArrayList<String>();
     }
 
     public String getAvatar() {
@@ -105,6 +106,24 @@ public class User {
 
     public void setFocusNum(int focusNum) {
         this.focusNum = focusNum;
+    }
+
+    public boolean isActivityCollected(Activity activity) {
+        for (String s : cols) {
+            if (s.equals(activity.getId())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean isActivityFocused(Activity activity) {
+        for (String s: focus) {
+            if (s.equals(activity.getId())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public static void save(Context context, User user) {

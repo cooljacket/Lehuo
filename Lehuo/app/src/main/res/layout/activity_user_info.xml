@@ -9,12 +9,7 @@
 
         <ImageView
             android:id="@+id/back"
-            android:layout_width="40dp"
-            android:layout_height="match_parent"
-            android:padding="5dp"
-            android:layout_alignParentLeft="true"
-            android:layout_centerVertical="true"
-            android:src="@mipmap/back" />
+            style="@style/title_back_img" />
 
         <TextView
             android:layout_width="wrap_content"

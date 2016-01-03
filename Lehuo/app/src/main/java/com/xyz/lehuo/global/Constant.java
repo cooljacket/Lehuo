@@ -11,6 +11,10 @@ public class Constant {
     public static final String REGISTER_API = SERVER_ADDRESS + "/api/register";
     public static final String UPDATE_USER_API = SERVER_ADDRESS + "/api/user/update";
     public static final String UPDATE_USER_LOGO_API = SERVER_ADDRESS + "/api/user/upload";
+    public static final String GET_ALL_CLUBS = SERVER_ADDRESS + "/api/club/index";
+    public static final String GET_ALL_ACTS_BY_CLUB = SERVER_ADDRESS + "/api/activity/get_all_acts_by_club";
+    public static final String GET_SOME_ACTS_BY_TYPE = SERVER_ADDRESS + "/api/activity/get_some_acts_by_type";
+    public static final String GET_MORE_ACTS_BY_TYPE = SERVER_ADDRESS + "/api/activity/get_more_acts_by_type";
 
     public static final String DATABASE_NAME = "lehuo.db";
     public static final String ACTIVITY_TABLE_NAME = "activity";

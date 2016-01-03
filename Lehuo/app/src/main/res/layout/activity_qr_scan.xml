@@ -2,20 +2,16 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/capture_containter"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" >
+    android:layout_height="match_parent">
 
-    <RelativeLayout style="@style/title"
+    <RelativeLayout
         android:id="@+id/title"
+        style="@style/title"
         android:layout_alignParentTop="true">
 
         <ImageView
             android:id="@+id/back"
-            android:layout_width="40dp"
-            android:layout_height="match_parent"
-            android:padding="5dp"
-            android:layout_alignParentLeft="true"
-            android:layout_centerVertical="true"
-            android:src="@mipmap/back" />
+            style="@style/title_back_img" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -28,16 +24,16 @@
     </RelativeLayout>
 
     <SurfaceView
-        android:layout_below="@id/title"
         android:id="@+id/capture_preview"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:layout_below="@id/title" />
 
     <ImageView
-        android:layout_below="@id/title"
         android:id="@+id/top_mask"
         android:layout_width="match_parent"
         android:layout_height="100dp"
+        android:layout_below="@id/title"
         android:background="@drawable/scan_mask"
         android:contentDescription="@string/app_name" />
 
@@ -48,7 +44,7 @@
         android:layout_below="@id/top_mask"
         android:layout_centerHorizontal="true"
         android:background="@drawable/capture"
-        android:contentDescription="@string/app_name" >
+        android:contentDescription="@string/app_name">
 
         <ImageView
             android:id="@+id/capture_scan_line"

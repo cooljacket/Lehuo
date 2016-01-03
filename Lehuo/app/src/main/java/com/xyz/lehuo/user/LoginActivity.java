@@ -27,6 +27,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 /**
  * Created by xyz on 15/12/24.
@@ -72,6 +73,15 @@ public class LoginActivity extends BaseActivity {
             public void onClick(View v) {
                 if (username.getText().toString().equals("") || password.getText().toString().equals("")) {
                     Toast.makeText(LoginActivity.this, "信息填写不完整", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                Pattern pattern = Pattern.compile("[a-zA-Z0-9]*");
+                if (!pattern.matcher(username.getText().toString().trim()).matches()) {
+                    Toast.makeText(LoginActivity.this, "用户名只能是英文字母或数字", Toast.LENGTH_SHORT);
+                    return;
+                }
+                if (!pattern.matcher(password.getText().toString().trim()).matches()) {
+                    Toast.makeText(LoginActivity.this, "密码只能是英文字母或数字", Toast.LENGTH_SHORT);
                     return;
                 }
                 String name = username.getText().toString().trim();

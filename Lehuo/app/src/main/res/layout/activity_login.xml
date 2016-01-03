@@ -1,18 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
-    android:layout_width="match_parent" android:layout_height="match_parent">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
     <RelativeLayout style="@style/title">
 
         <ImageView
             android:id="@+id/back"
-            android:layout_width="40dp"
-            android:layout_height="match_parent"
-            android:padding="5dp"
-            android:layout_alignParentLeft="true"
-            android:layout_centerVertical="true"
-            android:src="@mipmap/back" />
+            style="@style/title_back_img" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -35,41 +31,40 @@
 
     </RelativeLayout>
 
-    <LinearLayout
-        style="@style/register_layout_item">
+    <LinearLayout style="@style/register_layout_item">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="昵称："
             android:layout_gravity="center_vertical"
-            android:textSize="18sp"/>
+            android:text="昵称："
+            android:textSize="18sp" />
 
         <EditText
             android:id="@+id/user_name"
-            android:layout_gravity="center_vertical"
-            android:layout_marginLeft="10dp"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginLeft="10dp" />
 
     </LinearLayout>
-    <LinearLayout
-        style="@style/register_layout_item">
+
+    <LinearLayout style="@style/register_layout_item">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="密码："
             android:layout_gravity="center_vertical"
-            android:textSize="18sp"/>
+            android:text="密码："
+            android:textSize="18sp" />
 
         <EditText
             android:id="@+id/user_pwd"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:layout_marginLeft="10dp"
-            android:inputType="textPassword"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:inputType="textPassword" />
 
     </LinearLayout>
 
@@ -77,12 +72,12 @@
         android:id="@+id/login"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="登录"
-        android:paddingTop="10dp"
-        android:background="#448ab3"
-        android:paddingBottom="10dp"
         android:layout_margin="10dp"
-        android:textSize="20sp"
-        android:gravity="center"/>
+        android:background="#448ab3"
+        android:gravity="center"
+        android:paddingBottom="10dp"
+        android:paddingTop="10dp"
+        android:text="登录"
+        android:textSize="20sp" />
 
 </LinearLayout>

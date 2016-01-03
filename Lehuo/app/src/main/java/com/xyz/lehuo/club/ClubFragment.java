@@ -15,25 +15,32 @@ import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.xyz.lehuo.R;
 import com.xyz.lehuo.bean.Club;
+import com.xyz.lehuo.datebase.DatabaseManager;
+import com.xyz.lehuo.global.Constant;
+import com.xyz.lehuo.util.HttpUtil;
+
+import org.apache.http.NameValuePair;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class ClubFragment extends Fragment {
 
-    SwipeRefreshLayout refreshLayout;
-    ListView list;
-    MyAdapter adapter;
-    List<Club> clubs;
+    public static final String TAG = "ClubFragment";
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
+    private SwipeRefreshLayout refreshLayout;
+    private ListView list;
+    private MyAdapter adapter;
+    private List<Club> clubs;
+    private DatabaseManager databaseManager = new DatabaseManager(getActivity());
 
     @Nullable
     @Override
@@ -46,20 +53,60 @@ public class ClubFragment extends Fragment {
     private void initView(View v) {
         refreshLayout = (SwipeRefreshLayout) v.findViewById(R.id.refresh_layout);
         list = (ListView) v.findViewById(R.id.listview);
+        clubs = new ArrayList<Club>();
+        adapter = new MyAdapter(getActivity(), clubs);
+        list.setAdapter(adapter);
         initData();
         initListener();
     }
 
     private void initData() {
-        clubs = new ArrayList<Club>();
-        for (int i = 0; i < 2; i++) {
-            Club club = new Club();
-            club.setImgUrl("http://img.my.csdn.net/uploads/201309/01/1378037235_3453.jpg");
-            club.setName("社团");
-            clubs.add(club);
-        }
-        adapter = new MyAdapter(getActivity(), clubs);
-        list.setAdapter(adapter);
+        new HttpUtil().create(HttpUtil.POST, Constant.GET_ALL_CLUBS, new ArrayList<NameValuePair>(), new HttpUtil.HttpCallBallListener() {
+            @Override
+            public void onStart() {
+
+            }
+
+            @Override
+            public void onFinish() {
+                refreshLayout.setRefreshing(false);
+            }
+
+            @Override
+            public void onError() {
+                Toast.makeText(getActivity(), "网络错误", Toast.LENGTH_SHORT).show();
+                clubs = databaseManager.getAllClubs();
+                adapter.setData(clubs);
+            }
+
+            @Override
+            public void onSuccess(String result) {
+                try {
+                    JSONObject jsonObject = new JSONObject(result);
+                    if (jsonObject.getInt("code") == 1) {
+                        JSONArray data = jsonObject.getJSONArray("data");
+                        for (int i = 0; i < data.length(); i++) {
+                            JSONObject jo = data.optJSONObject(i);
+                            Club club = new Club();
+                            club.setName(jo.getString("name"));
+                            club.setIntro(jo.getString("intro"));
+                            club.setId(jo.getString("_id").substring(9, jo.getString("_id").length() - 2));
+                            club.setImgUrl(jo.getString("img_url"));
+                            clubs.add(club);
+                        }
+                        databaseManager.clearClubTable();
+                        databaseManager.addClubs(clubs);
+                        adapter.setData(clubs);
+                    } else {
+                        Toast.makeText(getActivity(), "服务器错误", Toast.LENGTH_SHORT).show();
+                        clubs = databaseManager.getAllClubs();
+                        adapter.setData(clubs);
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 
     private void initListener() {
@@ -69,13 +116,7 @@ public class ClubFragment extends Fragment {
         refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                refreshLayout.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        refreshLayout.setRefreshing(false);
-                        initData();
-                    }
-                }, 1000);
+                initData();
             }
         });
         list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -88,49 +129,19 @@ public class ClubFragment extends Fragment {
         });
     }
 
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-    }
-
     class MyAdapter extends BaseAdapter {
 
         Context context;
-        List<Club> societies;
+        List<Club> clubs;
 
-        MyAdapter(Context context, List<Club> societies) {
+        MyAdapter(Context context, List<Club> clubs) {
             this.context = context;
-            this.societies = societies;
+            this.clubs = clubs;
         }
 
         @Override
         public int getCount() {
-            return societies.size();
+            return clubs.size();
         }
 
         @Override
@@ -155,15 +166,20 @@ public class ClubFragment extends Fragment {
             } else {
                 viewHolder = (ViewHolder) convertView.getTag();
             }
-            Uri uri = Uri.parse(societies.get(position).getImgUrl());
+            Uri uri = Uri.parse(clubs.get(position).getImgUrl());
             viewHolder.img.setImageURI(uri);
-            viewHolder.name.setText(societies.get(position).getName());
+            viewHolder.name.setText(clubs.get(position).getName());
             return convertView;
         }
 
         class ViewHolder {
             SimpleDraweeView img;
             TextView name;
+        }
+
+        public void setData(List<Club> clubs) {
+            this.clubs = clubs;
+            this.notifyDataSetChanged();
         }
     }
 

@@ -1,9 +1,11 @@
 package com.xyz.lehuo.bean;
 
+import java.io.Serializable;
+
 /**
  * Created by xyz on 15/12/25.
  */
-public class Activity {
+public class Activity implements Serializable {
 
     private String id;
     private String title;

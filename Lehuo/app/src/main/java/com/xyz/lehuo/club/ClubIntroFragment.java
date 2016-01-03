@@ -36,6 +36,6 @@ public class ClubIntroFragment extends Fragment {
 
     private void initView(View view) {
         intro = (TextView) view.findViewById(R.id.intro);
-        intro.setText(((ClubDetailActivity)activity).intro);
+        intro.setText(((ClubDetailActivity)activity).club.getIntro());
     }
 }

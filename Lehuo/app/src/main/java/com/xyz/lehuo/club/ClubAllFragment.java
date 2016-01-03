@@ -3,12 +3,12 @@ package com.xyz.lehuo.club;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.TextView;
 
 import com.xyz.lehuo.R;
 import com.xyz.lehuo.bean.Activity;
@@ -22,16 +22,11 @@ import java.util.List;
  */
 public class ClubAllFragment extends Fragment {
 
+    public static final String TAG = "ClubAllFragment";
+
     private List<Activity> allActivities = new ArrayList<Activity>();
-    private android.app.Activity activity;
     private FirstAdapter adapter;
     private ListView listView;
-
-    @Override
-    public void onAttach(android.app.Activity activity) {
-        super.onAttach(activity);
-        this.activity = activity;
-    }
 
     @Nullable
     @Override
@@ -45,7 +40,6 @@ public class ClubAllFragment extends Fragment {
 
     private void initView(View view) {
         listView = (ListView) view.findViewById(R.id.listview);
-        ((TextView)view.findViewById(R.id.content)).setText("社团内容回顾");
     }
 
     private void initData() {
@@ -61,4 +55,9 @@ public class ClubAllFragment extends Fragment {
             }
         });
     }
+    public void setData(List<Activity> activities) {
+        adapter.setData(activities);
+        Log.i(TAG, "setData");
+    }
+
 }

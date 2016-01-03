@@ -12,8 +12,8 @@ public class Club implements Serializable {
     private String imgUrl;
     private String name;
     private String intro;
-    private ArrayList<Activity> activities;
-    private ArrayList<Activity> recentActivities;
+    private ArrayList<Activity> activities = new ArrayList<Activity>();
+    private ArrayList<Activity> recentActivities = new ArrayList<Activity>();
 
 
     public ArrayList<Activity> getActivities() {

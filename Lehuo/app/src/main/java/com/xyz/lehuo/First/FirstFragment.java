@@ -1,5 +1,6 @@
 package com.xyz.lehuo.first;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
@@ -13,9 +14,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.xyz.lehuo.R;
+import com.xyz.lehuo.util.HttpUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,19 +36,15 @@ public class FirstFragment extends Fragment {
     private View headView;
     private BannerAdapter bannerAdapter;
     private List<String> bannerUrls = new ArrayList<String>();
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
+    private ProgressDialog pd;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_first, container, false);
         initView(view);
-        initData();
         initListener();
+        initData();
         return view;
     }
 
@@ -76,19 +75,6 @@ public class FirstFragment extends Fragment {
         adapter.setData(activities);
     }
 
-    private void addData() {
-        for (int i = 0; i < 1; i++) {
-            com.xyz.lehuo.bean.Activity activity = new com.xyz.lehuo.bean.Activity();
-            activity.setTitle("奔跑奔跑｜奔跑奔跑奔跑奔跑奔跑奔跑");
-            activity.setEndDate("12.25");
-            activity.setReadNum(1000);
-            activity.setOrganizer("中山大学东校区数据学院发展中心");
-            activity.setImgUrl("http://img.my.csdn.net/uploads/201309/01/1378037235_3453.jpg");
-            activities.add(activity);
-        }
-        adapter.addData(activities);
-    }
-
     private void initListener() {
         refreshLayout.setColorSchemeResources(android.R.color.holo_green_dark,
                 android.R.color.holo_green_light, android.R.color.holo_orange_light,
@@ -109,48 +95,62 @@ public class FirstFragment extends Fragment {
 
     }
 
-    @Override
-    public void onStart() {
-        super.onStart();
+    private void dealResult(String result) {
+
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-    }
+    HttpUtil.HttpCallBallListener getData = new HttpUtil.HttpCallBallListener() {
+        @Override
+        public void onStart() {
+            pd = ProgressDialog.show(getActivity(), "提示", "加载中，请稍后");
+        }
 
-    @Override
-    public void onPause() {
-        super.onPause();
-    }
+        @Override
+        public void onFinish() {
+            pd.cancel();
+        }
 
-    @Override
-    public void onStop() {
-        super.onStop();
-    }
+        @Override
+        public void onError() {
+            Toast.makeText(getActivity(), "网络错误", Toast.LENGTH_SHORT).show();
+        }
 
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-    }
+        @Override
+        public void onSuccess(String result) {
+            dealResult(result);
+        }
+    };
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-    }
+    HttpUtil.HttpCallBallListener refreshData = new HttpUtil.HttpCallBallListener() {
+        @Override
+        public void onStart() {
 
+        }
+
+        @Override
+        public void onFinish() {
+            refreshLayout.setRefreshing(false);
+        }
+
+        @Override
+        public void onError() {
+            Toast.makeText(getActivity(), "网络错误", Toast.LENGTH_SHORT).show();
+        }
+
+        @Override
+        public void onSuccess(String result) {
+            dealResult(result);
+        }
+    };
 
     class BannerAdapter extends PagerAdapter {
 
         private Context context;
         private List<String> urls;
         private List<SimpleDraweeView> imageViews;
-        //private int imageWidth;
-        //private int imageHeight;
 
         public BannerAdapter(Context context, List<String> urls) {
             this.context = context;
-            //this.urls = urls;
             initUrls(urls);
         }
 
@@ -159,9 +159,7 @@ public class FirstFragment extends Fragment {
             imageViews = new ArrayList<SimpleDraweeView>();
             for (int i = 0; i < urls.size(); i++) {
                 Uri uri = Uri.parse(urls.get(i));
-                //ViewGroup.LayoutParams params = new ViewGroup.LayoutParams(300, 300);
                 SimpleDraweeView view = new SimpleDraweeView(context, null, R.style.banner_image);
-                //åview.setLayoutParams(params);
                 view.setImageURI(uri);
                 imageViews.add(view);
             }

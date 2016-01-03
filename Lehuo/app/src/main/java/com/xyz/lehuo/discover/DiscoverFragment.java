@@ -1,18 +1,29 @@
 package com.xyz.lehuo.discover;
 
+import android.app.ProgressDialog;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import com.xyz.lehuo.R;
 import com.xyz.lehuo.bean.Activity;
 import com.xyz.lehuo.first.FirstAdapter;
+import com.xyz.lehuo.global.Constant;
+import com.xyz.lehuo.util.HttpUtil;
 import com.zy.zlistview.view.ZListView;
+
+import org.apache.http.NameValuePair;
+import org.apache.http.message.BasicNameValuePair;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +37,9 @@ public class DiscoverFragment extends Fragment implements RadioGroup.OnCheckedCh
     private ZListView list;
     private List<Activity> activities = new ArrayList<Activity>();
     private FirstAdapter adapter;
+    private ProgressDialog pd;
+    private String type = "0";
+    List<RadioButton> radioButtons = new ArrayList<>();
 
     @Nullable
     @Override
@@ -44,37 +58,169 @@ public class DiscoverFragment extends Fragment implements RadioGroup.OnCheckedCh
     private void initView(View v) {
         typeGroup = (RadioGroup) v.findViewById(R.id.type_group);
         typeGroup.setOnCheckedChangeListener(this);
+        for (int i = 0; i < typeGroup.getChildCount(); i++) {
+            radioButtons.add((RadioButton) typeGroup.getChildAt(i));
+        }
         list = (ZListView) v.findViewById(R.id.listview);
         adapter = new FirstAdapter(activities, getActivity());
         list.setAdapter(adapter);
+        list.setPullLoadEnable(true);
+        list.setXListViewListener(new ZListView.IXListViewListener() {
+            @Override
+            public void onRefresh() {
+                List<NameValuePair> params = new ArrayList<NameValuePair>();
+                params.add(new BasicNameValuePair("type", type));
+                new HttpUtil().create(HttpUtil.POST, Constant.GET_SOME_ACTS_BY_TYPE, params, getNewDataCallBack);
+            }
+
+            @Override
+            public void onLoadMore() {
+                List<NameValuePair> params = new ArrayList<NameValuePair>();
+                params.add(new BasicNameValuePair("type", type));
+                params.add(new BasicNameValuePair("skip", String.valueOf(activities.size())));
+                new HttpUtil().create(HttpUtil.POST, Constant.GET_MORE_ACTS_BY_TYPE, params, getMoreDataCallBack);
+            }
+        });
     }
 
     private void initData() {
-        activities.clear();
-        for (int i = 0; i < 2; i++) {
-            com.xyz.lehuo.bean.Activity activity = new com.xyz.lehuo.bean.Activity();
-            activity.setTitle("奔跑奔跑｜奔跑奔跑奔跑奔跑奔跑奔跑");
-            activity.setEndDate("12.25");
-            activity.setReadNum(1000);
-            activity.setOrganizer("中山大学东校区数据学院发展中心");
-            activity.setImgUrl("http://img.my.csdn.net/uploads/201309/01/1378037235_3453.jpg");
-            activities.add(activity);
-        }
-        adapter.setData(activities);
+        List<NameValuePair> params = new ArrayList<>();
+        params.add(new BasicNameValuePair("type", type));
+        new HttpUtil().create(HttpUtil.POST, Constant.GET_SOME_ACTS_BY_TYPE, params, getNewDataCallBack);
     }
 
     @Override
     public void onCheckedChanged(RadioGroup group, int checkedId) {
+        setChechButton(group, checkedId);
+        List<NameValuePair> params = new ArrayList<>();
         switch (checkedId) {
             case R.id.display:
+                type = "0";
                 Toast.makeText(getActivity(), "展览", Toast.LENGTH_SHORT).show();
+                params.add(new BasicNameValuePair("type", type));
+                new HttpUtil().create(HttpUtil.POST, Constant.GET_SOME_ACTS_BY_TYPE, params, getNewDataCallBack);
                 break;
             case R.id.lecture:
+                type = "1";
+                Toast.makeText(getActivity(), "讲座", Toast.LENGTH_SHORT).show();
+                params.add(new BasicNameValuePair("type", type));
+                new HttpUtil().create(HttpUtil.POST, Constant.GET_SOME_ACTS_BY_TYPE, params, getNewDataCallBack);
                 break;
             case R.id.recruit:
+                type = "2";
+                Toast.makeText(getActivity(), "招聘", Toast.LENGTH_SHORT).show();
+                params.add(new BasicNameValuePair("type", type));
+                new HttpUtil().create(HttpUtil.POST, Constant.GET_SOME_ACTS_BY_TYPE, params, getNewDataCallBack);
                 break;
             case R.id.benefit:
+                type = "3";
+                Toast.makeText(getActivity(), "公益", Toast.LENGTH_SHORT).show();
+                params.add(new BasicNameValuePair("type", type));
+                new HttpUtil().create(HttpUtil.POST, Constant.GET_SOME_ACTS_BY_TYPE, params, getNewDataCallBack);
                 break;
         }
     }
+
+    private void setChechButton(RadioGroup group, int checkedId) {
+        for (int i = 0; i < radioButtons.size(); i++) {
+            if (radioButtons.get(i).getId() == checkedId) {
+                ((RadioButton)radioButtons.get(i)).setTextColor(Color.parseColor("#222222"));
+            } else {
+                ((RadioButton)radioButtons.get(i)).setTextColor(Color.parseColor("#24d399"));
+            }
+        }
+    }
+
+    HttpUtil.HttpCallBallListener getNewDataCallBack = new HttpUtil.HttpCallBallListener() {
+        @Override
+        public void onStart() {
+            pd = ProgressDialog.show(getActivity(), "提示", "加载中，请稍后");
+        }
+
+        @Override
+        public void onFinish() {
+            pd.cancel();
+            list.stopRefresh();
+        }
+
+        @Override
+        public void onError() {
+            Toast.makeText(getActivity(), "网络错误", Toast.LENGTH_SHORT).show();
+        }
+
+        @Override
+        public void onSuccess(String result) {
+            try {
+                JSONObject jsonObject = new JSONObject(result);
+                if (jsonObject.getInt("code") == 1) {
+                    JSONArray data = jsonObject.getJSONArray("data");
+                    activities.clear();
+                    for (int i = 0; i < data.length(); i++) {
+                        JSONObject jo = data.optJSONObject(i);
+                        Activity activity = new Activity();
+                        activity.setId(jo.getString("_id").substring(9, jo.getString("_id").length() - 2));
+                        activity.setReadNum(Integer.parseInt(jo.getString("read_nums")));
+                        activity.setEndDate(jo.getString("end_date"));
+                        activity.setTitle(jo.getString("title"));
+                        activity.setStartDate(jo.getString("start_date"));
+                        activity.setOrganizer(jo.getString("organizer"));
+                        activity.setDetailUrl(jo.getString("detail_url"));
+                        activity.setImgUrl(jo.getString("img_url"));
+                        activities.add(activity);
+                    }
+                    adapter.setData(activities);
+                } else {
+                    Toast.makeText(getActivity(), "服务器错误", Toast.LENGTH_SHORT).show();
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+    };
+
+    HttpUtil.HttpCallBallListener getMoreDataCallBack = new HttpUtil.HttpCallBallListener() {
+        @Override
+        public void onStart() {
+
+        }
+
+        @Override
+        public void onFinish() {
+            list.stopLoadMore();
+        }
+
+        @Override
+        public void onError() {
+            Toast.makeText(getActivity(), "网络错误", Toast.LENGTH_SHORT).show();
+        }
+
+        @Override
+        public void onSuccess(String result) {
+            try {
+                JSONObject jsonObject = new JSONObject(result);
+                if (jsonObject.getInt("code") == 1) {
+                    JSONArray data = jsonObject.getJSONArray("data");
+                    for (int i = 0; i < data.length(); i++) {
+                        JSONObject jo = data.optJSONObject(i);
+                        Activity activity = new Activity();
+                        activity.setId(jo.getString("_id").substring(9, jo.getString("_id").length() - 2));
+                        activity.setReadNum(Integer.parseInt(jo.getString("read_nums")));
+                        activity.setEndDate(jo.getString("end_date"));
+                        activity.setTitle(jo.getString("title"));
+                        activity.setStartDate(jo.getString("start_date"));
+                        activity.setOrganizer(jo.getString("organizer"));
+                        activity.setDetailUrl(jo.getString("detail_url"));
+                        activity.setImgUrl(jo.getString("img_url"));
+                        activities.add(activity);
+                    }
+                    adapter.setData(activities);
+                } else {
+                    Toast.makeText(getActivity(), "服务器错误", Toast.LENGTH_SHORT).show();
+                }
+            } catch (JSONException e) {
+                //e.printStackTrace();
+                Toast.makeText(getActivity(), "没有更多数据了", Toast.LENGTH_SHORT).show();
+            }
+        }
+    };
 }

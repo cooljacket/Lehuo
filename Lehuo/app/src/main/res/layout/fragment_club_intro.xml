@@ -6,8 +6,8 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:textAppearance="?android:attr/textAppearanceLarge"
         android:text="社团简介"
-        android:padding="20dp"
+        android:padding="14dp"
+        android:textColor="#222222"
         android:id="@+id/intro" />
 </LinearLayout>
