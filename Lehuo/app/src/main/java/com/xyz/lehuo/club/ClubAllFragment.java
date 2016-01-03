@@ -1,5 +1,6 @@
 package com.xyz.lehuo.club;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -11,6 +12,7 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.xyz.lehuo.R;
+import com.xyz.lehuo.WebActivity;
 import com.xyz.lehuo.bean.Activity;
 import com.xyz.lehuo.first.FirstAdapter;
 
@@ -51,11 +53,15 @@ public class ClubAllFragment extends Fragment {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
+                Intent intent = new Intent(getActivity(), WebActivity.class);
+                intent.putExtra("activity", allActivities.get(position));
+                startActivity(intent);
             }
         });
     }
+
     public void setData(List<Activity> activities) {
+        allActivities = activities;
         adapter.setData(activities);
         Log.i(TAG, "setData");
     }

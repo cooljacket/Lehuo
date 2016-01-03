@@ -20,7 +20,6 @@ import android.widget.Toast;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.xyz.lehuo.R;
 import com.xyz.lehuo.bean.Club;
-import com.xyz.lehuo.datebase.DatabaseManager;
 import com.xyz.lehuo.global.Constant;
 import com.xyz.lehuo.util.HttpUtil;
 
@@ -40,7 +39,7 @@ public class ClubFragment extends Fragment {
     private ListView list;
     private MyAdapter adapter;
     private List<Club> clubs;
-    private DatabaseManager databaseManager = new DatabaseManager(getActivity());
+//    private DatabaseManager databaseManager = new DatabaseManager(getActivity());
 
     @Nullable
     @Override
@@ -75,7 +74,7 @@ public class ClubFragment extends Fragment {
             @Override
             public void onError() {
                 Toast.makeText(getActivity(), "网络错误", Toast.LENGTH_SHORT).show();
-                clubs = databaseManager.getAllClubs();
+//                clubs = databaseManager.getAllClubs();
                 adapter.setData(clubs);
             }
 
@@ -94,12 +93,12 @@ public class ClubFragment extends Fragment {
                             club.setImgUrl(jo.getString("img_url"));
                             clubs.add(club);
                         }
-                        databaseManager.clearClubTable();
-                        databaseManager.addClubs(clubs);
+//                        databaseManager.clearClubTable();
+//                        databaseManager.addClubs(clubs);
                         adapter.setData(clubs);
                     } else {
                         Toast.makeText(getActivity(), "服务器错误", Toast.LENGTH_SHORT).show();
-                        clubs = databaseManager.getAllClubs();
+//                        clubs = databaseManager.getAllClubs();
                         adapter.setData(clubs);
                     }
                 } catch (JSONException e) {

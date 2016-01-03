@@ -3,7 +3,6 @@ package com.xyz.lehuo.user;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -22,6 +21,7 @@ import com.xyz.lehuo.util.SPUtil;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -119,8 +119,16 @@ public class LoginActivity extends BaseActivity {
                                 user.setGrade(Constant.grades[Integer.parseInt(object.getString("grade"))]);
                                 user.setSex(object.getString("sex").equals("1") ? "男" : "女");
                                 user.setUid(object.getString("_id").substring(9, object.getString("_id").length() - 2));
-                                Log.i("LoginActivity", "uid====>" + user.getUid());
                                 user.setAvatar(object.getString("avatar_url"));
+                                JSONArray array = object.getJSONArray("collect");
+                                for (int i = 0; i < array.length(); i++) {
+                                    user.addCollection(array.getString(i));
+                                }
+                                array = object.getJSONArray("like");
+                                for (int i = 0; i < array.length(); i++) {
+                                    user.addFocus(array.getString(i));
+                                }
+
                                 User.save(LoginActivity.this, user);
                                 ((MyApplication)getApplication()).setUser(user);
                                 SPUtil.put(LoginActivity.this, "isLogin", Conf.isLogin);

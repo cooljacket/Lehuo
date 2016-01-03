@@ -1,6 +1,8 @@
 package com.xyz.lehuo;
 
+import android.app.ProgressDialog;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
@@ -12,17 +14,33 @@ import com.xyz.lehuo.bean.Activity;
 import com.xyz.lehuo.bean.User;
 import com.xyz.lehuo.global.BaseActivity;
 import com.xyz.lehuo.global.Conf;
+import com.xyz.lehuo.global.Constant;
 import com.xyz.lehuo.global.MyApplication;
+import com.xyz.lehuo.util.HttpUtil;
+
+import org.apache.http.NameValuePair;
+import org.apache.http.message.BasicNameValuePair;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by xyz on 15/12/30.
  */
 public class WebActivity extends BaseActivity implements View.OnClickListener {
 
+    public static final String TAG = "WebActivity";
+
     private ImageView col;
     private ImageView like;
     private WebView webView;
     private Activity activity;
+    private ProgressDialog pd;
+    private User user;
+    private boolean isCollect;
+    private boolean isLike;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,18 +55,28 @@ public class WebActivity extends BaseActivity implements View.OnClickListener {
         col = (ImageView) findViewById(R.id.collection);
         like = (ImageView) findViewById(R.id.like);
         webView = (WebView) findViewById(R.id.webview);
+        findViewById(R.id.back).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
+        like.setOnClickListener(this);
+        col.setOnClickListener(this);
     }
 
     private void initData() {
         activity = (Activity) getIntent().getSerializableExtra("activity");
         if (Conf.isLogin == true) {
-            User user = ((MyApplication)getApplication()).getUser();
-            if (user.isActivityCollected(activity)) {
+            user = ((MyApplication)getApplication()).getUser();
+            isCollect = user.isActivityCollected(activity);
+            isLike = user.isActivityFocused(activity);
+            if (isCollect) {
                 col.setImageResource(R.mipmap.collection_pressed);
             } else {
                 col.setImageResource(R.mipmap.collection);
             }
-            if (user.isActivityFocused(activity)) {
+            if (isLike) {
                 like.setImageResource(R.mipmap.like_pressed);
             } else {
                 like.setImageResource(R.mipmap.like);
@@ -72,6 +100,7 @@ public class WebActivity extends BaseActivity implements View.OnClickListener {
         settings.setUseWideViewPort(true);
         webView.setWebViewClient(new WebViewClient());
         webView.loadUrl(activity.getDetailUrl());
+        Log.i(TAG, "url===============>" + activity.getDetailUrl());
     }
 
     @Override
@@ -80,22 +109,127 @@ public class WebActivity extends BaseActivity implements View.OnClickListener {
             Toast.makeText(this, "请先登录", Toast.LENGTH_SHORT).show();
             return;
         }
-        User user = ((MyApplication)getApplication()).getUser();
         switch (v.getId()) {
             case R.id.collection:
-                if (user.isActivityCollected(activity)) {
-
-                } else {
-
-                }
+                sendColRequest();
                 break;
             case R.id.like:
-                if (user.isActivityFocused(activity)) {
-
-                } else {
-
-                }
+                sendLikeRequest();
                 break;
         }
     }
+
+    private void sendColRequest() {
+        String url;
+        List<NameValuePair> params = new ArrayList<>();
+        params.add(new BasicNameValuePair("uid", user.getUid()));
+        params.add(new BasicNameValuePair("aid", activity.getId()));
+        if (isCollect) {
+            url = Constant.UN_COLLECT;
+        } else {
+            url = Constant.COLLECT;
+        }
+        new HttpUtil().create(HttpUtil.POST, url, params, colCallBack);
+    }
+
+    private HttpUtil.HttpCallBallListener colCallBack = new HttpUtil.HttpCallBallListener() {
+        @Override
+        public void onStart() {
+            pd = ProgressDialog.show(WebActivity.this, "提示", "加载中，请稍后");
+        }
+
+        @Override
+        public void onFinish() {
+            pd.cancel();
+        }
+
+        @Override
+        public void onError() {
+            Toast.makeText(WebActivity.this, "网络出错", Toast.LENGTH_SHORT).show();
+        }
+
+        @Override
+        public void onSuccess(String result) {
+            try {
+                JSONObject jsonObject = new JSONObject(result);
+                if (jsonObject.getInt("code") == 1) {
+                    if (isCollect) {
+                        Toast.makeText(WebActivity.this, "取消收藏", Toast.LENGTH_SHORT).show();
+                        isCollect = false;
+                        user.cancleCol(activity.getId());
+                    } else {
+                        Toast.makeText(WebActivity.this, "收藏成功", Toast.LENGTH_SHORT).show();
+                        isCollect = true;
+                        user.addCollection(activity.getId());
+                    }
+                } else {
+                    if (isCollect) {
+                        Toast.makeText(WebActivity.this, "取消失败", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(WebActivity.this, "收藏失败", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+    };
+
+    public void sendLikeRequest() {
+        String url;
+        List<NameValuePair> params = new ArrayList<>();
+        params.add(new BasicNameValuePair("uid", user.getUid()));
+        params.add(new BasicNameValuePair("aid", activity.getId()));
+        if (isLike) {
+            url = Constant.UN_LIKE;
+        } else {
+            url = Constant.LIKE;
+        }
+        new HttpUtil().create(HttpUtil.POST, url, params, likeCallBack);
+    }
+
+    private HttpUtil.HttpCallBallListener likeCallBack = new HttpUtil.HttpCallBallListener() {
+        @Override
+        public void onStart() {
+            pd = ProgressDialog.show(WebActivity.this, "提示", "加载中，请稍后");
+        }
+
+        @Override
+        public void onFinish() {
+            pd.cancel();
+        }
+
+        @Override
+        public void onError() {
+            Toast.makeText(WebActivity.this, "网络出错", Toast.LENGTH_SHORT).show();
+        }
+
+        @Override
+        public void onSuccess(String result) {
+            try {
+                JSONObject jsonObject = new JSONObject(result);
+                if (jsonObject.getInt("code") == 1) {
+                    if (isLike) {
+                        Toast.makeText(WebActivity.this, "取消点赞", Toast.LENGTH_SHORT).show();
+                        isLike = false;
+                        user.cancleFocus(activity.getId());
+                        like.setImageResource(R.mipmap.like);
+                    } else {
+                        Toast.makeText(WebActivity.this, "点赞成功", Toast.LENGTH_SHORT).show();
+                        isLike = true;
+                        user.addFocus(activity.getId());
+                        like.setImageResource(R.mipmap.like_pressed);
+                    }
+                } else {
+                    if (isLike) {
+                        Toast.makeText(WebActivity.this, "取消失败", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(WebActivity.this, "点赞失败", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+    };
 }

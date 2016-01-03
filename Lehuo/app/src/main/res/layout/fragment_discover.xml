@@ -23,6 +23,7 @@
                 <RadioButton
                     android:id="@+id/display"
                     style="@style/radio_btn_discover"
+                    android:textColor="#222222"
                     android:text="展览" />
 
                 <RadioButton

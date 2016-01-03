@@ -126,6 +126,36 @@ public class User {
         return false;
     }
 
+    public void addCollection(String aid) {
+        cols.add(aid);
+        colsNum++;
+    }
+
+    public void addFocus(String aid) {
+        focus.add(aid);
+        focusNum++;
+    }
+
+    public void cancleCol(String aid) {
+        for (String s: cols) {
+            if (s.equals(aid)) {
+                cols.remove(s);
+                colsNum--;
+                return;
+            }
+        }
+    }
+
+    public void cancleFocus(String aid) {
+        for (String s : focus) {
+            if (s.equals(aid)) {
+                focus.remove(s);
+                focusNum--;
+                return;
+            }
+        }
+    }
+
     public static void save(Context context, User user) {
         SPUtil.put(context, "major", user.getMajor());
         SPUtil.put(context, "name", user.getName());

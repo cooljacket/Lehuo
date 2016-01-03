@@ -1,6 +1,7 @@
 package com.xyz.lehuo.discover;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -8,11 +9,13 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import com.xyz.lehuo.R;
+import com.xyz.lehuo.WebActivity;
 import com.xyz.lehuo.bean.Activity;
 import com.xyz.lehuo.first.FirstAdapter;
 import com.xyz.lehuo.global.Constant;
@@ -79,6 +82,14 @@ public class DiscoverFragment extends Fragment implements RadioGroup.OnCheckedCh
                 params.add(new BasicNameValuePair("type", type));
                 params.add(new BasicNameValuePair("skip", String.valueOf(activities.size())));
                 new HttpUtil().create(HttpUtil.POST, Constant.GET_MORE_ACTS_BY_TYPE, params, getMoreDataCallBack);
+            }
+        });
+        list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Intent intent = new Intent(getActivity(), WebActivity.class);
+                intent.putExtra("activity", activities.get(position-1));
+                startActivity(intent);
             }
         });
     }
