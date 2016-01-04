@@ -137,6 +137,7 @@ public class LikeActivity extends BaseActivity {
             JSONObject jsonObject = new JSONObject(result);
             if (jsonObject.getInt("code") == 1) {
                 JSONArray data = jsonObject.getJSONArray("data");
+                activities.clear();
                 for (int i = 0; i < data.length(); i++) {
                     JSONObject jo = data.optJSONObject(i);
                     Activity activity = new Activity();
